@@ -7,6 +7,7 @@ import { CategoryBadge } from "@/components/CategoryBadge";
 import { ListingImage } from "@/components/ListingImage";
 
 export const metadata = { title: "My orders" };
+export const dynamic = "force-dynamic";
 
 const STATUS_STYLES: Record<string, string> = {
   PENDING: "bg-warning/15 text-warning",

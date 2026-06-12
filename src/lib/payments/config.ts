@@ -11,7 +11,8 @@ export function paymentConfig() {
     nowPaymentsKey,
     ipnSecret,
     cryptoInvoiceTtlMinutes: Number(process.env.CRYPTO_INVOICE_TTL_MINUTES ?? "30"),
-    allowSimulateConfirm: process.env.NODE_ENV !== "production" || process.env.ALLOW_CRYPTO_SIMULATE === "1",
+    allowSimulateConfirm:
+      !nowPaymentsKey || process.env.NODE_ENV !== "production" || process.env.ALLOW_CRYPTO_SIMULATE === "1",
   };
 }
 

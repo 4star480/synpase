@@ -1,4 +1,5 @@
 import { prisma } from "@/lib/prisma";
+import { revalidateOrderViews } from "@/lib/revalidate-orders";
 import { createCryptoInvoice } from "./crypto-invoice";
 import { normalizeGiftCardCode } from "./config";
 import { validateGiftCardCodeInput } from "./gift-card";
@@ -69,6 +70,7 @@ export async function startCheckout(opts: {
 
         return o;
       });
+      revalidateOrderViews();
       return { ok: true, orderId: order.id, redirect: "/orders" };
     } catch (e) {
       return { ok: false, error: e instanceof Error ? e.message : "Gift card payment failed." };
@@ -110,6 +112,7 @@ export async function startCheckout(opts: {
       },
     });
 
+    revalidateOrderViews();
     return {
       ok: true,
       orderId: order.id,
@@ -181,6 +184,7 @@ export async function completeCryptoPayment(orderId: string, txHash?: string) {
     }),
   ]);
 
+  revalidateOrderViews();
   return { ok: true as const };
 }
 

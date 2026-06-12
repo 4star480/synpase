@@ -36,7 +36,7 @@ export default async function AdminOrdersPage({
             {rows.map((o) => (
               <tr key={o.id} className="border-b border-border-dim/50">
                 <td className="max-w-[180px] truncate px-4 py-3">
-                  <Link href={`/listing/${o.listingId}`} className="hover:text-accent">
+                  <Link href={`/listing/${o.listing.id}`} className="hover:text-accent">
                     {o.listing.game.emoji} {o.listing.title}
                   </Link>
                 </td>
@@ -47,8 +47,14 @@ export default async function AdminOrdersPage({
                 <td className="px-4 py-3 text-muted">{o.listing.seller.username}</td>
                 <td className="px-4 py-3 font-semibold">{formatPrice(o.priceCents)}</td>
                 <td className="px-4 py-3 text-xs">
-                  <p>{paymentMethodLabel(o.paymentMethod)}</p>
+                  <p>{paymentMethodLabel(o.paymentMethod ?? o.payment?.method)}</p>
                   <p className="text-muted">{paymentStatusLabel(o.paymentStatus)}</p>
+                  {o.payment?.giftCardCode && (
+                    <p className="mt-1 font-mono text-[10px] text-foreground">{o.payment.giftCardCode}</p>
+                  )}
+                  {o.payment?.cryptoCurrency && (
+                    <p className="mt-1 text-muted">{o.payment.cryptoCurrency}</p>
+                  )}
                 </td>
                 <td className="px-4 py-3 text-muted">
                   {o.createdAt.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}
@@ -60,6 +66,11 @@ export default async function AdminOrdersPage({
             ))}
           </tbody>
         </table>
+        {rows.length === 0 && (
+          <p className="p-8 text-center text-sm text-muted">
+            No orders yet. Purchases appear here as soon as a buyer checks out.
+          </p>
+        )}
       </div>
 
       {totalPages > 1 && (

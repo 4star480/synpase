@@ -1,8 +1,8 @@
 "use server";
 
-import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { getSessionUserId } from "@/lib/session";
+import { revalidateOrderViews } from "@/lib/revalidate-orders";
 import { startCheckout } from "@/lib/payments/checkout";
 import { validateGiftCardCodeInput } from "@/lib/payments/gift-card";
 import type { CryptoCurrencyId, PaymentMethod } from "@/lib/payments/types";
@@ -60,8 +60,7 @@ export async function processCheckout(
 
   if (!result.ok) return { error: result.error };
 
-  revalidatePath(`/listing/${listingId}`);
-  revalidatePath("/orders");
+  revalidateOrderViews();
   redirect(result.redirect);
 }
 

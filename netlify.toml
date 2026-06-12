@@ -1,6 +1,6 @@
 [build]
   # Download JPG covers into public/ (gitignored locally; bundled in deploy output)
-  command = "npm run images:download && npm run build"
+  command = "npx prisma db push && npm run images:download && npm run build"
 
 [build.environment]
   NODE_VERSION = "20"

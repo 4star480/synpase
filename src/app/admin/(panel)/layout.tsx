@@ -3,6 +3,8 @@ import { requireAdmin } from "@/lib/session";
 import { AdminSidebar } from "@/components/admin/AdminSidebar";
 import { adminLogout } from "@/lib/actions/auth";
 
+export const dynamic = "force-dynamic";
+
 export default async function AdminPanelLayout({ children }: { children: React.ReactNode }) {
   const admin = await requireAdmin();
   if (!admin) redirect("/admin/login");

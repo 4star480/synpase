@@ -133,8 +133,10 @@ export async function adminOrders(page = 1) {
     prisma.order.findMany({
       include: {
         buyer: { select: { username: true, email: true } },
+        payment: { select: { method: true, status: true, giftCardCode: true, cryptoCurrency: true } },
         listing: {
           select: {
+            id: true,
             title: true,
             game: { select: { emoji: true } },
             seller: { select: { username: true } },
