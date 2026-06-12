@@ -10,7 +10,7 @@ export type OrderPaymentStatus = (typeof ORDER_PAYMENT_STATUSES)[number];
 export const CRYPTO_CURRENCIES = [
   { id: "BTC", label: "Bitcoin", symbol: "₿", coingeckoId: "bitcoin", decimals: 8 },
   { id: "ETH", label: "Ethereum", symbol: "Ξ", coingeckoId: "ethereum", decimals: 6 },
-  { id: "USDT", label: "Tether (TRC20)", symbol: "₮", coingeckoId: "tether", decimals: 2 },
+  { id: "USDT", label: "Tether (USDT ERC20)", symbol: "₮", coingeckoId: "tether", decimals: 2 },
   { id: "LTC", label: "Litecoin", symbol: "Ł", coingeckoId: "litecoin", decimals: 6 },
 ] as const;
 
@@ -22,7 +22,6 @@ export type CryptoCheckoutDetails = {
   address: string;
   invoiceId: string;
   expiresAt: string;
-  qrData: string;
   usdAmount: number;
   rateUsd: number;
   simulated: boolean;

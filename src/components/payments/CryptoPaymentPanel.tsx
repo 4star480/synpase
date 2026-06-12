@@ -3,7 +3,6 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { formatPrice } from "@/lib/format";
-import { cryptoQrUrl } from "@/lib/payments/crypto-invoice";
 import { CRYPTO_CURRENCIES } from "@/lib/payments/types";
 
 type PaymentPayload = {
@@ -92,7 +91,14 @@ export function CryptoPaymentPanel({
     );
   }
 
-  const qr = cryptoQrUrl(p.cryptoAddress);
+  const networkHint =
+    p.cryptoCurrency === "USDT" || p.cryptoCurrency === "ETH"
+      ? "Ethereum (ERC20) network only"
+      : p.cryptoCurrency === "BTC"
+        ? "Bitcoin network only"
+        : p.cryptoCurrency === "LTC"
+          ? "Litecoin network only"
+          : null;
 
   return (
     <div className="space-y-6">
@@ -105,49 +111,46 @@ export function CryptoPaymentPanel({
         {meta && <p className="mt-1 text-xs text-muted">{meta.label}</p>}
       </div>
 
-      <div className="flex flex-col items-center gap-4 sm:flex-row sm:items-start">
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src={qr} alt="Payment QR code" className="rounded-xl border border-border-dim bg-white p-2" width={220} height={220} />
-        <div className="min-w-0 flex-1 space-y-4 w-full">
-          <div>
-            <p className="text-xs font-semibold uppercase text-muted">Wallet address</p>
-            <div className="mt-1 flex gap-2">
-              <code className="flex-1 break-all rounded-lg bg-surface-2 px-3 py-2 text-xs">{p.cryptoAddress}</code>
-              <button
-                type="button"
-                onClick={() => copy(p.cryptoAddress!, "addr")}
-                className="shrink-0 rounded-lg border border-border-dim px-3 py-2 text-xs font-semibold hover:border-accent"
-              >
-                {copied === "addr" ? "Copied" : "Copy"}
-              </button>
-            </div>
+      <div className="space-y-4 rounded-2xl border border-border-dim bg-surface p-6">
+        <div>
+          <p className="text-xs font-semibold uppercase text-muted">Wallet address</p>
+          <div className="mt-1 flex gap-2">
+            <code className="flex-1 break-all rounded-lg bg-surface-2 px-3 py-2 text-xs">{p.cryptoAddress}</code>
+            <button
+              type="button"
+              onClick={() => copy(p.cryptoAddress!, "addr")}
+              className="shrink-0 rounded-lg border border-border-dim px-3 py-2 text-xs font-semibold hover:border-accent"
+            >
+              {copied === "addr" ? "Copied" : "Copy"}
+            </button>
           </div>
-          <div>
-            <p className="text-xs font-semibold uppercase text-muted">Amount</p>
-            <div className="mt-1 flex gap-2">
-              <code className="flex-1 rounded-lg bg-surface-2 px-3 py-2 text-sm font-bold">{p.cryptoAmount}</code>
-              <button
-                type="button"
-                onClick={() => copy(p.cryptoAmount!, "amt")}
-                className="shrink-0 rounded-lg border border-border-dim px-3 py-2 text-xs font-semibold hover:border-accent"
-              >
-                {copied === "amt" ? "Copied" : "Copy"}
-              </button>
-            </div>
-          </div>
-          {p.expiresAt && (
-            <p className="text-xs text-warning">
-              Expires {new Date(p.expiresAt).toLocaleString()} — status updates automatically every 8s
-            </p>
-          )}
         </div>
+        <div>
+          <p className="text-xs font-semibold uppercase text-muted">Amount</p>
+          <div className="mt-1 flex gap-2">
+            <code className="flex-1 rounded-lg bg-surface-2 px-3 py-2 text-sm font-bold">{p.cryptoAmount}</code>
+            <button
+              type="button"
+              onClick={() => copy(p.cryptoAmount!, "amt")}
+              className="shrink-0 rounded-lg border border-border-dim px-3 py-2 text-xs font-semibold hover:border-accent"
+            >
+              {copied === "amt" ? "Copied" : "Copy"}
+            </button>
+          </div>
+        </div>
+        {p.expiresAt && (
+          <p className="text-xs text-warning">
+            Expires {new Date(p.expiresAt).toLocaleString()} — status updates automatically every 8s
+          </p>
+        )}
       </div>
 
       <div className="rounded-xl border border-border-dim bg-surface-2 p-4 text-sm text-muted">
         <p className="font-semibold text-foreground">{data.listingTitle}</p>
         <p className="mt-2">
-          Send only <strong className="text-foreground">{p.cryptoCurrency}</strong> to this address. Wrong network =
-          lost funds. TradeGuard releases payment to the seller after you confirm delivery.
+          Send only <strong className="text-foreground">{p.cryptoCurrency}</strong> to this address
+          {networkHint ? ` on the ${networkHint}` : ""}. Wrong network = lost funds. TradeGuard releases payment to
+          the seller after you confirm delivery.
         </p>
       </div>
 
