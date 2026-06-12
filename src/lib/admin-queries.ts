@@ -1,23 +1,26 @@
 import { prisma } from "./prisma";
 
 export async function adminDashboardStats() {
-  const [listings, activeListings, orders, users, sellers, reviews, revenue] = await Promise.all([
-    prisma.listing.count(),
-    prisma.listing.count({ where: { status: "ACTIVE" } }),
-    prisma.order.count(),
-    prisma.user.count(),
-    prisma.user.count({ where: { listings: { some: {} } } }),
-    prisma.review.count(),
-    prisma.order.aggregate({
-      where: { paymentStatus: "PAID" },
-      _sum: { priceCents: true },
-    }),
-  ]);
+  const [listings, activeListings, orders, payments, users, sellers, reviews, revenue] =
+    await Promise.all([
+      prisma.listing.count(),
+      prisma.listing.count({ where: { status: "ACTIVE" } }),
+      prisma.order.count(),
+      prisma.payment.count(),
+      prisma.user.count(),
+      prisma.user.count({ where: { listings: { some: {} } } }),
+      prisma.review.count(),
+      prisma.order.aggregate({
+        where: { paymentStatus: "PAID" },
+        _sum: { priceCents: true },
+      }),
+    ]);
 
   return {
     listings,
     activeListings,
     orders,
+    payments,
     users,
     sellers,
     reviews,
@@ -52,6 +55,48 @@ export async function adminListings(page = 1, q = "") {
   ]);
 
   return { rows, total, page, perPage, totalPages: Math.ceil(total / perPage) };
+}
+
+export async function adminPayments(page = 1) {
+  const perPage = 25;
+  const [rows, total, completedAgg] = await Promise.all([
+    prisma.payment.findMany({
+      include: {
+        order: {
+          include: {
+            buyer: { select: { username: true, email: true } },
+            listing: {
+              select: {
+                id: true,
+                title: true,
+                game: { select: { emoji: true } },
+              },
+            },
+          },
+        },
+        giftCard: { select: { code: true, label: true } },
+      },
+      orderBy: { createdAt: "desc" },
+      skip: (page - 1) * perPage,
+      take: perPage,
+    }),
+    prisma.payment.count(),
+    prisma.payment.aggregate({
+      where: { status: "COMPLETED" },
+      _sum: { amountCents: true },
+      _count: true,
+    }),
+  ]);
+
+  return {
+    rows,
+    total,
+    page,
+    perPage,
+    totalPages: Math.ceil(total / perPage),
+    completedCount: completedAgg._count,
+    completedCents: completedAgg._sum.amountCents ?? 0,
+  };
 }
 
 export async function adminOrders(page = 1) {

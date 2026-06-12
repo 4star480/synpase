@@ -11,10 +11,11 @@ export default async function AdminDashboardPage() {
     { label: "Total products", value: stats.listings.toLocaleString(), href: "/admin/listings" },
     { label: "Active listings", value: stats.activeListings.toLocaleString(), href: "/admin/listings" },
     { label: "Orders", value: stats.orders.toLocaleString(), href: "/admin/orders" },
+    { label: "Payments", value: stats.payments.toLocaleString(), href: "/admin/payments" },
     { label: "Users", value: stats.users.toLocaleString(), href: "/admin/users" },
     { label: "Sellers", value: stats.sellers.toLocaleString(), href: "/admin/users" },
     { label: "Reviews", value: stats.reviews.toLocaleString(), href: "/admin/listings" },
-    { label: "Order volume", value: formatPrice(stats.revenueCents), href: "/admin/orders" },
+    { label: "Paid volume", value: formatPrice(stats.revenueCents), href: "/admin/payments" },
   ];
 
   return (
@@ -56,6 +57,9 @@ export default async function AdminDashboardPage() {
           </Link>
           <Link href="/admin/orders" className="rounded-lg border border-border-dim px-4 py-2 text-sm transition hover:border-accent">
             View orders
+          </Link>
+          <Link href="/admin/payments" className="rounded-lg border border-border-dim px-4 py-2 text-sm transition hover:border-accent">
+            View payments
           </Link>
           <Link href="/" className="rounded-lg border border-border-dim px-4 py-2 text-sm transition hover:border-accent">
             View live store

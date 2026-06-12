@@ -33,6 +33,14 @@ const PAYMENT_STATUS_LABELS: Record<string, string> = {
   REFUNDED: "Refunded",
 };
 
+const PAYMENT_RECORD_STATUS_LABELS: Record<string, string> = {
+  PENDING: "Pending",
+  AWAITING: "Awaiting",
+  COMPLETED: "Completed",
+  FAILED: "Failed",
+  EXPIRED: "Expired",
+};
+
 export function paymentMethodLabel(method: string | null | undefined): string {
   if (!method) return "Standard";
   return PAYMENT_METHOD_LABELS[method] ?? method;
@@ -40,4 +48,14 @@ export function paymentMethodLabel(method: string | null | undefined): string {
 
 export function paymentStatusLabel(status: string): string {
   return PAYMENT_STATUS_LABELS[status] ?? status;
+}
+
+export function paymentRecordStatusLabel(status: string): string {
+  return PAYMENT_RECORD_STATUS_LABELS[status] ?? status;
+}
+
+export function maskCode(code: string | null | undefined): string {
+  if (!code) return "—";
+  if (code.length <= 4) return code;
+  return `••••${code.slice(-4)}`;
 }

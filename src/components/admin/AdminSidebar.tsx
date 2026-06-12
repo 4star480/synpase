@@ -11,6 +11,7 @@ const LINKS = [
   { href: "/admin/listings", label: "Products", icon: "📦" },
   { href: "/admin/listings/new", label: "Add product", icon: "➕" },
   { href: "/admin/orders", label: "Orders", icon: "🧾" },
+  { href: "/admin/payments", label: "Payments", icon: "💳" },
   { href: "/admin/gift-cards", label: "Gift cards", icon: "🎁" },
   { href: "/admin/users", label: "Users", icon: "👥" },
 ];
