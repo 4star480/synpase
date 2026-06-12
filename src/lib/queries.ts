@@ -1,4 +1,5 @@
 import { prisma } from "./prisma";
+import { queryRawUnsafe } from "./pg-sql";
 import { parseSearchQuery, resolveGameSlug } from "./search";
 import type { ListingCardData } from "@/components/ListingCard";
 import type { GameCard } from "@/components/GameCarousel";
@@ -143,7 +144,7 @@ async function searchListingIds(
   }
 
   const countSql = `SELECT COUNT(*) as cnt FROM (${sql})`;
-  const countRow = await prisma.$queryRawUnsafe<{ cnt: bigint }[]>(countSql, ...params);
+  const countRow = await queryRawUnsafe<{ cnt: bigint }[]>(countSql, params);
   const total = Number(countRow[0]?.cnt ?? 0);
 
   const page = Math.max(1, filters.page ?? 1);
@@ -158,12 +159,11 @@ async function searchListingIds(
           : 'l."createdAt" DESC';
 
   const pageSql = `${sql} ORDER BY ${sort} LIMIT ? OFFSET ?`;
-  const rows = await prisma.$queryRawUnsafe<{ id: string }[]>(
-    pageSql,
+  const rows = await queryRawUnsafe<{ id: string }[]>(pageSql, [
     ...params,
     perPage,
     (page - 1) * perPage,
-  );
+  ]);
 
   return { ids: rows.map((r) => r.id), total };
 }
@@ -240,7 +240,7 @@ export async function searchSuggestions(q: string, limit = 8) {
     FROM "Listing" l INNER JOIN "Game" g ON l."gameId" = g.id
     WHERE l.status = 'ACTIVE'
   `;
-  const params: string[] = [];
+  const params: (string | number)[] = [];
 
   if (parsed.categoryHint) {
     sql += ` AND l.category = ?`;
@@ -262,9 +262,9 @@ export async function searchSuggestions(q: string, limit = 8) {
   }
 
   sql += ` ORDER BY l.views DESC LIMIT ?`;
-  params.push(String(limit));
+  params.push(limit);
 
-  return prisma.$queryRawUnsafe<
+  return queryRawUnsafe<
     {
       id: string;
       title: string;
@@ -274,7 +274,24 @@ export async function searchSuggestions(q: string, limit = 8) {
       gameEmoji: string;
       gameSlug: string;
     }[]
-  >(sql, ...params);
+  >(sql, params);
+}
+
+export async function searchGameSuggestions(q: string, limit = 4) {
+  const trimmed = q.trim();
+  if (trimmed.length < 2) return [];
+
+  return prisma.game.findMany({
+    where: {
+      OR: [
+        { name: { contains: trimmed, mode: "insensitive" } },
+        { slug: { contains: trimmed.toLowerCase().replace(/\s+/g, "-"), mode: "insensitive" } },
+      ],
+    },
+    select: { name: true, slug: true, emoji: true },
+    orderBy: { name: "asc" },
+    take: limit,
+  });
 }
 
 export async function featuredListings(take = 8): Promise<ListingCardData[]> {

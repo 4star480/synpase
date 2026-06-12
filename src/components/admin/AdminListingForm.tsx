@@ -1,6 +1,6 @@
 "use client";
 
-import { useActionState, useState } from "react";
+import { useActionState, useRef, useState } from "react";
 import Image from "next/image";
 import type { AdminFormState } from "@/lib/actions/admin";
 import { CATEGORIES } from "@/lib/format";
@@ -38,19 +38,67 @@ export function AdminListingForm({
   deleteAction?: () => Promise<void>;
 }) {
   const [state, formAction, pending] = useActionState(action, {});
+  const fileRef = useRef<HTMLInputElement>(null);
   const initialPreview =
     listing?.imagePath && isListingUploadPath(listing.imagePath)
       ? listingUploadSrc(listing.imagePath)
       : listing?.imagePath || null;
   const [preview, setPreview] = useState<string | null>(initialPreview);
+  const [fileName, setFileName] = useState<string | null>(null);
 
   function onImageChange(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
-    if (file) setPreview(URL.createObjectURL(file));
+    if (file) {
+      setPreview(URL.createObjectURL(file));
+      setFileName(file.name);
+    }
   }
 
   return (
     <form action={formAction} encType="multipart/form-data" className="space-y-6">
+      <div className="rounded-xl border-2 border-accent/30 bg-surface p-5 sm:p-6">
+        <h2 className="font-semibold">Product image</h2>
+        <p className="mt-1 text-xs text-muted">
+          Optional. JPG, PNG, WebP or GIF — max 5 MB. Leave empty to use the game cover art.
+        </p>
+        {preview && (
+          <div className="relative mt-4 aspect-video max-w-md overflow-hidden rounded-lg bg-surface-2">
+            <Image
+              src={preview}
+              alt="Product preview"
+              fill
+              className="object-cover"
+              unoptimized={preview.startsWith("blob:") || preview.startsWith("/api/")}
+            />
+          </div>
+        )}
+        <input
+          ref={fileRef}
+          type="file"
+          name="image"
+          accept="image/jpeg,image/png,image/webp,image/gif"
+          onChange={onImageChange}
+          className="sr-only"
+        />
+        <button
+          type="button"
+          onClick={() => fileRef.current?.click()}
+          className="mt-4 flex w-full max-w-md flex-col items-center justify-center rounded-xl border-2 border-dashed border-accent/50 bg-surface-2 px-4 py-8 text-center transition active:scale-[0.99] active:border-accent"
+        >
+          <span className="text-2xl" aria-hidden>
+            📷
+          </span>
+          <span className="mt-2 text-sm font-semibold text-accent">
+            {fileName ? "Change photo" : "Tap to upload product photo"}
+          </span>
+          {fileName ? (
+            <span className="mt-1 max-w-full truncate text-xs text-muted">{fileName}</span>
+          ) : (
+            <span className="mt-1 text-xs text-muted">Works on phone and desktop</span>
+          )}
+        </button>
+      </div>
+
       <div className="grid gap-6 lg:grid-cols-[1fr_280px]">
         <div className="space-y-5 rounded-xl border border-border-dim bg-surface p-6">
           <h2 className="font-semibold">Product details</h2>
@@ -113,77 +161,47 @@ export function AdminListingForm({
           </label>
         </div>
 
-        <div className="space-y-5">
-          <div className="rounded-xl border border-border-dim bg-surface p-6">
-            <h2 className="font-semibold">Pricing & stock</h2>
-            <div className="mt-4 space-y-4">
-              <label className="block">
-                <span className="mb-1.5 block text-sm font-medium">Price (USD)</span>
-                <input
-                  name="price"
-                  type="number"
-                  step="0.01"
-                  min="0.01"
-                  required
-                  defaultValue={listing ? (listing.priceCents / 100).toFixed(2) : ""}
-                  className={inputClass}
-                />
-              </label>
-              <label className="block">
-                <span className="mb-1.5 block text-sm font-medium">Stock</span>
-                <input name="stock" type="number" min="0" required defaultValue={listing?.stock ?? 1} className={inputClass} />
-              </label>
-              <label className="block">
-                <span className="mb-1.5 block text-sm font-medium">Delivery time</span>
-                <select name="deliveryMins" defaultValue={String(listing?.deliveryMins ?? 60)} className={inputClass}>
-                  <option value="15">15 minutes</option>
-                  <option value="60">1 hour</option>
-                  <option value="240">4 hours</option>
-                  <option value="720">12 hours</option>
-                  <option value="1440">1 day</option>
-                  <option value="4320">3 days</option>
-                </select>
-              </label>
-              <label className="block">
-                <span className="mb-1.5 block text-sm font-medium">Status</span>
-                <select name="status" defaultValue={listing?.status ?? "ACTIVE"} className={inputClass}>
-                  <option value="ACTIVE">Active</option>
-                  <option value="PAUSED">Paused</option>
-                  <option value="SOLD_OUT">Sold out</option>
-                </select>
-              </label>
-              <label className="flex items-center gap-2 text-sm">
-                <input type="checkbox" name="featured" defaultChecked={listing?.featured} className="h-4 w-4 rounded accent-accent" />
-                Featured on homepage
-              </label>
-            </div>
-          </div>
-
-          <div className="rounded-xl border border-border-dim bg-surface p-6">
-            <h2 className="font-semibold">Product image</h2>
-            <p className="mt-1 text-xs text-muted">
-              Upload a photo for this listing. JPG, PNG, WebP or GIF — max 5 MB. Leave empty to use the game cover.
-            </p>
-            {preview && (
-              <div className="relative mt-3 aspect-video overflow-hidden rounded-lg bg-surface-2">
-                <Image
-                  src={preview}
-                  alt="Product preview"
-                  fill
-                  className="object-cover"
-                  unoptimized={preview.startsWith("blob:") || preview.startsWith("/api/")}
-                />
-              </div>
-            )}
-            <label className="mt-3 block">
-              <span className="sr-only">Choose product image</span>
+        <div className="rounded-xl border border-border-dim bg-surface p-6">
+          <h2 className="font-semibold">Pricing & stock</h2>
+          <div className="mt-4 space-y-4">
+            <label className="block">
+              <span className="mb-1.5 block text-sm font-medium">Price (USD)</span>
               <input
-                type="file"
-                name="image"
-                accept="image/jpeg,image/png,image/webp,image/gif"
-                onChange={onImageChange}
-                className="w-full text-sm text-muted file:mr-3 file:rounded-lg file:border-0 file:bg-accent file:px-3 file:py-2 file:text-sm file:font-semibold file:text-white hover:file:bg-accent-hover"
+                name="price"
+                type="number"
+                step="0.01"
+                min="0.01"
+                required
+                defaultValue={listing ? (listing.priceCents / 100).toFixed(2) : ""}
+                className={inputClass}
               />
+            </label>
+            <label className="block">
+              <span className="mb-1.5 block text-sm font-medium">Stock</span>
+              <input name="stock" type="number" min="0" required defaultValue={listing?.stock ?? 1} className={inputClass} />
+            </label>
+            <label className="block">
+              <span className="mb-1.5 block text-sm font-medium">Delivery time</span>
+              <select name="deliveryMins" defaultValue={String(listing?.deliveryMins ?? 60)} className={inputClass}>
+                <option value="15">15 minutes</option>
+                <option value="60">1 hour</option>
+                <option value="240">4 hours</option>
+                <option value="720">12 hours</option>
+                <option value="1440">1 day</option>
+                <option value="4320">3 days</option>
+              </select>
+            </label>
+            <label className="block">
+              <span className="mb-1.5 block text-sm font-medium">Status</span>
+              <select name="status" defaultValue={listing?.status ?? "ACTIVE"} className={inputClass}>
+                <option value="ACTIVE">Active</option>
+                <option value="PAUSED">Paused</option>
+                <option value="SOLD_OUT">Sold out</option>
+              </select>
+            </label>
+            <label className="flex items-center gap-2 text-sm">
+              <input type="checkbox" name="featured" defaultChecked={listing?.featured} className="h-4 w-4 rounded accent-accent" />
+              Featured on homepage
             </label>
           </div>
         </div>

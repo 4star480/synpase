@@ -21,3 +21,10 @@ export function validateGiftCardCodeInput(codeRaw: string): GiftCardValidation {
 
   return { valid: true, maskedCode: maskGiftCardCode(code) };
 }
+
+export function generateGiftCardCode(): string {
+  const chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+  const block = () =>
+    Array.from({ length: 4 }, () => chars[Math.floor(Math.random() * chars.length)]).join("");
+  return `GIFT-${block()}-${block()}`;
+}

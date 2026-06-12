@@ -29,7 +29,7 @@ export async function adminDashboardStats() {
 }
 
 export async function adminListings(page = 1, q = "") {
-  const perPage = 20;
+  const perPage = 50;
   const where = q.trim()
     ? {
         OR: [
