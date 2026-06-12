@@ -1,3 +1,4 @@
+import { gameCoverSrc } from "@/lib/images";
 import { CoverImage } from "./CoverImage";
 
 export function GameCover({
@@ -19,7 +20,7 @@ export function GameCover({
   className?: string;
 }) {
   const heights = { sm: "h-20", md: "h-28", lg: "h-36", hero: "h-48" };
-  const src = coverImage ?? (slug ? `/images/games/${slug}.jpg` : "/images/categories/item.svg");
+  const src = slug ? gameCoverSrc(slug, coverImage) : "/images/categories/item.svg";
 
   return (
     <CoverImage

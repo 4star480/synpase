@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useRef } from "react";
+import { gameCoverSrc } from "@/lib/images";
 import { CoverImage } from "./CoverImage";
 
 export type GameCard = {
@@ -57,7 +58,7 @@ export function GameCarousel({ games }: { games: GameCard[] }) {
             >
               <div className="relative h-24 w-full overflow-hidden">
                 <CoverImage
-                  src={game.coverImage ?? `/images/games/${game.slug}.jpg`}
+                  src={gameCoverSrc(game.slug, game.coverImage)}
                   slug={game.slug}
                   alt={game.name}
                   name={game.name}

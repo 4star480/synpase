@@ -1,3 +1,4 @@
+import { gameCoverSrc } from "@/lib/images";
 import { CoverImage } from "./CoverImage";
 
 export function ListingImage({
@@ -19,10 +20,9 @@ export function ListingImage({
   title?: string;
   className?: string;
 }) {
-  const src =
-    imagePath ??
-    gameCover ??
-    (gameSlug ? `/images/games/${gameSlug}.jpg` : "/images/categories/item.svg");
+  const src = imagePath?.startsWith("/uploads/")
+    ? imagePath
+    : gameCoverSrc(gameSlug ?? "", gameCover);
 
   return (
     <div className={`relative shrink-0 overflow-hidden rounded-lg bg-surface-2 ${className}`}>

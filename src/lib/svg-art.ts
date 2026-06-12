@@ -283,6 +283,11 @@ export function generateAllLocalImages(publicRoot: string, games: GameArtInput[]
 }
 
 export function gameCoverPublicPath(publicRoot: string, slug: string): string {
-  if (existsSync(join(publicRoot, "images", "games", `${slug}.svg`))) return `/images/games/${slug}.svg`;
+  if (existsSync(join(publicRoot, "images", "games", `${slug}.jpg`))) {
+    return `/images/games/${slug}.jpg`;
+  }
+  if (existsSync(join(publicRoot, "images", "games", `${slug}.svg`))) {
+    return `/images/games/${slug}.svg`;
+  }
   return `/images/games/${slug}.svg`;
 }

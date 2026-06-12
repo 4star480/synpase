@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { SITE_NAME } from "@/lib/brand";
+import { gameCoverSrc } from "@/lib/images";
 import { allGames } from "@/lib/queries";
 import { CoverImage } from "@/components/CoverImage";
 
@@ -63,7 +64,7 @@ export default async function GamesIndexPage() {
                     className="group flex items-center gap-3 rounded-xl border border-border-dim/60 bg-surface p-2.5 transition active:scale-[0.99] active:border-accent/40 sm:p-2 sm:hover:border-accent/40"
                   >
                     <CoverImage
-                      src={g.coverImage ?? `/images/games/${g.slug}.jpg`}
+                      src={gameCoverSrc(g.slug, g.coverImage)}
                       slug={g.slug}
                       alt={g.name}
                       bannerFrom={g.bannerFrom}

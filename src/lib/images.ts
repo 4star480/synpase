@@ -1,24 +1,26 @@
 /** Game cover paths — prefer downloaded JPG artwork */
 
-/** Bump when local cover files change so phones drop stale cached JPGs */
-export const COVER_CACHE_VERSION = 4;
+import { EXTERNAL_COVER_URLS } from "../../prisma/game-cover-urls";
 
-/** Slugs that must load from a verified remote URL (not Steam / stale cache) */
-const REMOTE_COVER_OVERRIDES: Record<string, string> = {
-  fortnite:
-    "https://cms-assets.unrealengine.com/cm6l5gfpm05kr07my04cqgy2x/cmfo4y74z03yw07ohsjgs0qj7",
-};
+/** Bump when local cover files change so phones drop stale cached JPGs */
+export const COVER_CACHE_VERSION = 5;
 
 function withCacheBust(path: string): string {
   const sep = path.includes("?") ? "&" : "?";
   return `${path}${sep}v=${COVER_CACHE_VERSION}`;
 }
 
+/** Verified remote artwork (non-Steam titles, etc.) */
+function remoteCoverUrl(slug: string): string | undefined {
+  return EXTERNAL_COVER_URLS[slug];
+}
+
 export function gameCoverSrc(slug: string, coverImage?: string | null): string {
-  if (REMOTE_COVER_OVERRIDES[slug]) return REMOTE_COVER_OVERRIDES[slug];
+  const remote = remoteCoverUrl(slug);
+  if (remote) return remote;
   if (coverImage?.startsWith("/uploads/")) return coverImage;
-  if (coverImage?.startsWith("/images/games/")) return withCacheBust(coverImage);
-  if (coverImage) return coverImage;
+  if (coverImage?.startsWith("http")) return coverImage;
+  // Prefer JPG (built on Netlify or local); CoverImage falls back to SVG on 404
   return withCacheBust(`/images/games/${slug}.jpg`);
 }
 
@@ -37,8 +39,9 @@ export function resolveListingVisual(opts: {
   category?: string;
 }): string {
   if (opts.imagePath?.startsWith("/uploads/")) return opts.imagePath;
-  if (opts.gameSlug && REMOTE_COVER_OVERRIDES[opts.gameSlug]) {
-    return REMOTE_COVER_OVERRIDES[opts.gameSlug];
+  if (opts.gameSlug) {
+    const remote = remoteCoverUrl(opts.gameSlug);
+    if (remote) return remote;
   }
   if (opts.gameCover) return gameCoverSrc(opts.gameSlug ?? "", opts.gameCover);
   if (opts.gameSlug) return gameCoverSrc(opts.gameSlug);
