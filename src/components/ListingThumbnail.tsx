@@ -2,6 +2,7 @@
 
 import { CATEGORY_ART } from "@/lib/game-art";
 import { categoryLabel } from "@/lib/format";
+import { isListingUploadPath, listingUploadSrc } from "@/lib/listing-upload-path";
 import { CoverImage } from "./CoverImage";
 
 export function ListingThumbnail({
@@ -28,8 +29,9 @@ export function ListingThumbnail({
   const from = bannerFrom ?? "#1a2236";
   const to = bannerTo ?? "#12182a";
   const src =
-    imagePath ??
-    (gameSlug ? `/images/games/${gameSlug}.jpg` : "/images/categories/item.svg");
+    imagePath && isListingUploadPath(imagePath)
+      ? listingUploadSrc(imagePath)
+      : imagePath ?? (gameSlug ? `/images/games/${gameSlug}.jpg` : "/images/categories/item.svg");
 
   return (
     <div className="relative aspect-[16/10] w-full overflow-hidden rounded-lg bg-surface-2">

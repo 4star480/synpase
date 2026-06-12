@@ -38,8 +38,8 @@ export default async function GamesIndexPage() {
         Browse {games.length} supported games — accounts, currency, items, and boosting services.
       </p>
 
-      <div className="sticky top-14 z-20 -mx-4 mt-6 border-b border-border-dim/40 bg-background/95 px-4 py-3 backdrop-blur-xl sm:static sm:mx-0 sm:mt-8 sm:border-0 sm:bg-transparent sm:px-0 sm:py-0 sm:backdrop-blur-none">
-        <div className="scroll-touch scrollbar-hide flex gap-2 overflow-x-auto pb-1 sm:flex-wrap sm:overflow-visible">
+      <div className="mt-6 border-b border-border-dim/40 pb-3 sm:mt-8 lg:sticky lg:top-[68px] lg:z-20 lg:bg-background/95 lg:py-3 lg:backdrop-blur-xl">
+        <div className="flex flex-wrap gap-2 lg:scroll-touch lg:scrollbar-hide lg:flex-nowrap lg:overflow-x-auto lg:pb-1">
           {letters.map((l) => (
             <a
               key={l}

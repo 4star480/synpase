@@ -1,6 +1,7 @@
 /** Game cover paths — prefer downloaded JPG artwork */
 
 import { EXTERNAL_COVER_URLS } from "../../prisma/game-cover-urls";
+import { isListingUploadPath, listingUploadSrc } from "./listing-upload-path";
 
 /** Bump when local cover files change so phones drop stale cached JPGs */
 export const COVER_CACHE_VERSION = 5;
@@ -18,6 +19,7 @@ function remoteCoverUrl(slug: string): string | undefined {
 export function gameCoverSrc(slug: string, coverImage?: string | null): string {
   const remote = remoteCoverUrl(slug);
   if (remote) return remote;
+  if (coverImage && isListingUploadPath(coverImage)) return listingUploadSrc(coverImage);
   if (coverImage?.startsWith("/uploads/")) return coverImage;
   if (coverImage?.startsWith("http")) return coverImage;
   // Prefer JPG (built on Netlify or local); CoverImage falls back to SVG on 404
@@ -38,6 +40,7 @@ export function resolveListingVisual(opts: {
   gameCover?: string | null;
   category?: string;
 }): string {
+  if (opts.imagePath && isListingUploadPath(opts.imagePath)) return listingUploadSrc(opts.imagePath);
   if (opts.imagePath?.startsWith("/uploads/")) return opts.imagePath;
   if (opts.gameSlug) {
     const remote = remoteCoverUrl(opts.gameSlug);

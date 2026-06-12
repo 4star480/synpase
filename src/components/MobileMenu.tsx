@@ -1,8 +1,10 @@
 "use client";
 
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { useEffect, useLayoutEffect, useRef } from "react";
 import { logout } from "@/lib/actions/auth";
+import { lockBodyScroll, unlockBodyScroll } from "@/lib/body-scroll-lock";
 import { Avatar } from "./Avatar";
 
 const MENU_ID = "synpase-mobile-menu";
@@ -36,11 +38,20 @@ function MenuIcon({ open }: { open: boolean }) {
 
 function closeMenu() {
   const input = document.getElementById(MENU_ID) as HTMLInputElement | null;
-  if (input) input.checked = false;
+  if (!input?.checked) return;
+  input.checked = false;
+  unlockBodyScroll();
 }
 
 export function MobileMenu({ user }: { user: MenuUser | null }) {
   const rootRef = useRef<HTMLDivElement>(null);
+  const pathname = usePathname();
+
+  useEffect(() => {
+    const input = document.getElementById(MENU_ID) as HTMLInputElement | null;
+    if (input?.checked) input.checked = false;
+    unlockBodyScroll();
+  }, [pathname]);
 
   useLayoutEffect(() => {
     const root = rootRef.current;
@@ -53,14 +64,15 @@ export function MobileMenu({ user }: { user: MenuUser | null }) {
     if (!input) return;
 
     const syncScroll = () => {
-      document.body.style.overflow = input.checked ? "hidden" : "";
+      if (input.checked) lockBodyScroll();
+      else unlockBodyScroll();
     };
 
     syncScroll();
     input.addEventListener("change", syncScroll);
     return () => {
       input.removeEventListener("change", syncScroll);
-      document.body.style.overflow = "";
+      unlockBodyScroll();
     };
   }, []);
 

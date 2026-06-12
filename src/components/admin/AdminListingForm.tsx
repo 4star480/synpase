@@ -4,6 +4,7 @@ import { useActionState, useState } from "react";
 import Image from "next/image";
 import type { AdminFormState } from "@/lib/actions/admin";
 import { CATEGORIES } from "@/lib/format";
+import { isListingUploadPath, listingUploadSrc } from "@/lib/listing-upload-path";
 
 type ListingData = {
   id?: string;
@@ -37,7 +38,11 @@ export function AdminListingForm({
   deleteAction?: () => Promise<void>;
 }) {
   const [state, formAction, pending] = useActionState(action, {});
-  const [preview, setPreview] = useState<string | null>(listing?.imagePath || null);
+  const initialPreview =
+    listing?.imagePath && isListingUploadPath(listing.imagePath)
+      ? listingUploadSrc(listing.imagePath)
+      : listing?.imagePath || null;
+  const [preview, setPreview] = useState<string | null>(initialPreview);
 
   function onImageChange(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
@@ -45,7 +50,7 @@ export function AdminListingForm({
   }
 
   return (
-    <form action={formAction} className="space-y-6">
+    <form action={formAction} encType="multipart/form-data" className="space-y-6">
       <div className="grid gap-6 lg:grid-cols-[1fr_280px]">
         <div className="space-y-5 rounded-xl border border-border-dim bg-surface p-6">
           <h2 className="font-semibold">Product details</h2>
@@ -156,19 +161,30 @@ export function AdminListingForm({
 
           <div className="rounded-xl border border-border-dim bg-surface p-6">
             <h2 className="font-semibold">Product image</h2>
-            <p className="mt-1 text-xs text-muted">JPG, PNG, WebP or GIF — max 5 MB</p>
+            <p className="mt-1 text-xs text-muted">
+              Upload a photo for this listing. JPG, PNG, WebP or GIF — max 5 MB. Leave empty to use the game cover.
+            </p>
             {preview && (
               <div className="relative mt-3 aspect-video overflow-hidden rounded-lg bg-surface-2">
-                <Image src={preview} alt="Preview" fill className="object-cover" unoptimized={preview.startsWith("blob:")} />
+                <Image
+                  src={preview}
+                  alt="Product preview"
+                  fill
+                  className="object-cover"
+                  unoptimized={preview.startsWith("blob:") || preview.startsWith("/api/")}
+                />
               </div>
             )}
-            <input
-              type="file"
-              name="image"
-              accept="image/jpeg,image/png,image/webp,image/gif"
-              onChange={onImageChange}
-              className="mt-3 w-full text-sm text-muted file:mr-3 file:rounded-lg file:border-0 file:bg-accent file:px-3 file:py-2 file:text-sm file:font-semibold file:text-white"
-            />
+            <label className="mt-3 block">
+              <span className="sr-only">Choose product image</span>
+              <input
+                type="file"
+                name="image"
+                accept="image/jpeg,image/png,image/webp,image/gif"
+                onChange={onImageChange}
+                className="w-full text-sm text-muted file:mr-3 file:rounded-lg file:border-0 file:bg-accent file:px-3 file:py-2 file:text-sm file:font-semibold file:text-white hover:file:bg-accent-hover"
+              />
+            </label>
           </div>
         </div>
       </div>

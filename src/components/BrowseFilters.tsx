@@ -26,7 +26,7 @@ export function BrowseFilterBar({
   }
 
   return (
-    <div className="sticky top-14 z-30 -mx-4 space-y-3 border-b border-border-dim/40 bg-background/95 px-4 py-3 backdrop-blur-xl sm:static sm:mx-0 sm:border-0 sm:bg-transparent sm:px-0 sm:py-0 sm:backdrop-blur-none lg:top-[68px]">
+    <div className="-mx-4 space-y-3 border-b border-border-dim/40 px-4 py-3 sm:mx-0 sm:px-0 lg:sticky lg:top-[68px] lg:z-30 lg:bg-background/95 lg:backdrop-blur-xl">
       <div className="flex flex-wrap gap-2">
         <Link
           href={href({ category: null })}
