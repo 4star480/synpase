@@ -1,18 +1,17 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 import { jwtVerify } from "jose";
+import { getSessionSecret } from "@/lib/env";
 
 const COOKIE = "gametrade_session";
 const USER_PROTECTED = ["/sell", "/orders"];
 const ADMIN_PREFIX = "/admin";
 
 async function getSession(request: NextRequest) {
-  const secret = process.env.SESSION_SECRET;
-  if (!secret) return null;
   const token = request.cookies.get(COOKIE)?.value;
   if (!token) return null;
   try {
-    const { payload } = await jwtVerify(token, new TextEncoder().encode(secret));
+    const { payload } = await jwtVerify(token, getSessionSecret());
     return { userId: payload.sub as string, role: (payload.role as string) ?? "USER" };
   } catch {
     return null;

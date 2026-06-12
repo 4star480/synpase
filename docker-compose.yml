@@ -1,0 +1,17 @@
+# Local / VPS deployment with PostgreSQL (recommended for production-like hosting).
+# Usage: docker compose up -d && npm run db:deploy
+services:
+  db:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: gametrade
+      POSTGRES_PASSWORD: gametrade
+      POSTGRES_DB: gametrade
+    ports:
+      - "5432:5432"
+    volumes:
+      - gametrade_pg:/var/lib/postgresql/data
+
+volumes:
+  gametrade_pg:

@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="160" height="48" viewBox="0 0 160 48">
+  <rect width="160" height="48" rx="8" fill="#0f1420" stroke="#005594" stroke-opacity="0.4"/>
+  <text x="80" y="30" text-anchor="middle" font-size="11" font-family="system-ui,sans-serif" font-weight="700" fill="white" opacity="0.85">CNBC</text>
+</svg>

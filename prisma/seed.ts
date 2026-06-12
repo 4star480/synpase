@@ -17,8 +17,15 @@ function resolveGameCover(slug: string): string {
 }
 
 async function main() {
-  console.log("Downloading game & category images...");
-  await downloadAllImages(ROOT);
+  const skipImages =
+    process.env.SKIP_IMAGE_DOWNLOAD === "1" || process.env.NODE_ENV === "production";
+
+  if (skipImages) {
+    console.log("Skipping image download (production / SKIP_IMAGE_DOWNLOAD=1).");
+  } else {
+    console.log("Downloading game & category images...");
+    await downloadAllImages(ROOT);
+  }
 
   console.log("Clearing marketplace data...");
   await prisma.payment.deleteMany();
@@ -40,7 +47,8 @@ async function main() {
     gameMap[g.slug] = { id: game.id };
   }
 
-  const adminHash = await bcrypt.hash("admin123456", 10);
+  const adminPassword = process.env.ADMIN_PASSWORD?.trim() || "admin123456";
+  const adminHash = await bcrypt.hash(adminPassword, 10);
   const admin = await prisma.user.create({
     data: {
       username: "GameTradeAdmin",
@@ -52,7 +60,7 @@ async function main() {
       verified: true,
     },
   });
-  console.log("Admin account: admin@gametrade.com / admin123456");
+  console.log(`Admin account: admin@gametrade.com (password from ADMIN_PASSWORD or default)`);
 
   console.log("Seeding gift cards...");
   const giftCards = [

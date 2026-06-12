@@ -1,8 +1,8 @@
 import { SignJWT, jwtVerify } from "jose";
 import { cookies } from "next/headers";
+import { getSessionSecret, isProduction } from "./env";
 import { prisma } from "./prisma";
 
-const secret = new TextEncoder().encode(process.env.SESSION_SECRET!);
 const COOKIE = "gametrade_session";
 
 export async function createSession(userId: string, role = "USER") {
@@ -10,11 +10,12 @@ export async function createSession(userId: string, role = "USER") {
     .setProtectedHeader({ alg: "HS256" })
     .setIssuedAt()
     .setExpirationTime("30d")
-    .sign(secret);
+    .sign(getSessionSecret());
   const store = await cookies();
   store.set(COOKIE, token, {
     httpOnly: true,
     sameSite: "lax",
+    secure: isProduction(),
     path: "/",
     maxAge: 60 * 60 * 24 * 30,
   });
@@ -30,7 +31,7 @@ export async function getSessionUserId(): Promise<string | null> {
   const token = store.get(COOKIE)?.value;
   if (!token) return null;
   try {
-    const { payload } = await jwtVerify(token, secret);
+    const { payload } = await jwtVerify(token, getSessionSecret());
     return (payload.sub as string) ?? null;
   } catch {
     return null;

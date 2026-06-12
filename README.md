@@ -33,7 +33,9 @@ On Windows PowerShell: `Copy-Item .env.example .env`
 
 ### Admin panel
 
-Open **http://localhost:3000/admin** after seeding. Admin credentials are printed when you run `npm run db:seed`.
+Open **http://localhost:3000/admin/login** after seeding. Credentials are printed when you run `npm run db:seed`.
+
+For production deployment (Vercel, Railway, VPS), see **[DEPLOYMENT.md](./DEPLOYMENT.md)**.
 
 ## Payments
 

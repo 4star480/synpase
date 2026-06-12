@@ -20,9 +20,13 @@
 # production
 /build
 
-# downloaded images (run npm run db:seed)
-/public/images/
-/public/uploads/
+# large downloaded artwork (SVG fallbacks are committed)
+/public/images/**/*.jpg
+/public/images/**/*.jpeg
+/public/images/**/*.png
+/public/images/**/*.webp
+/public/uploads/*
+!/public/uploads/.gitkeep
 
 # misc
 .DS_Store
