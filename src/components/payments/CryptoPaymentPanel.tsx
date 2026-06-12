@@ -39,7 +39,7 @@ export function CryptoPaymentPanel({
 
   useEffect(() => {
     if (paid) {
-      const t = setTimeout(() => router.push("/orders"), 2000);
+      const t = setTimeout(() => router.push("/orders?purchased=1"), 2000);
       return () => clearTimeout(t);
     }
     const id = setInterval(async () => {
@@ -47,7 +47,7 @@ export function CryptoPaymentPanel({
       if (!res.ok) return;
       const next = (await res.json()) as PaymentPayload;
       setData(next);
-      if (next.paymentStatus === "PAID") router.push("/orders");
+      if (next.paymentStatus === "PAID") router.push("/orders?purchased=1");
     }, 8000);
     return () => clearInterval(id);
   }, [data.orderId, paid, router]);
@@ -66,7 +66,7 @@ export function CryptoPaymentPanel({
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ orderId: data.orderId }),
       });
-      if (res.ok) router.push("/orders");
+      if (res.ok) router.push("/orders?purchased=1");
     } finally {
       setConfirming(false);
     }

@@ -1,7 +1,7 @@
 "use server";
 
 import { redirect } from "next/navigation";
-import { getSessionUserId } from "@/lib/session";
+import { getCurrentUser, getSessionUserId } from "@/lib/session";
 import { revalidateOrderViews } from "@/lib/revalidate-orders";
 import { startCheckout } from "@/lib/payments/checkout";
 import { validateGiftCardCodeInput } from "@/lib/payments/gift-card";
@@ -17,8 +17,9 @@ export async function processCheckout(
   _prev: CheckoutFormState,
   formData: FormData
 ): Promise<CheckoutFormState> {
-  const buyerId = await getSessionUserId();
-  if (!buyerId) return { error: "Please log in to checkout." };
+  const user = await getCurrentUser();
+  if (!user) return { error: "Please log in to checkout." };
+  const buyerId = user.id;
 
   const listingId = String(formData.get("listingId") ?? "");
   const method = String(formData.get("method") ?? "") as PaymentMethod;

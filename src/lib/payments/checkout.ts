@@ -71,7 +71,7 @@ export async function startCheckout(opts: {
         return o;
       });
       revalidateOrderViews();
-      return { ok: true, orderId: order.id, redirect: "/orders" };
+      return { ok: true, orderId: order.id, redirect: "/orders?purchased=1" };
     } catch (e) {
       return { ok: false, error: e instanceof Error ? e.message : "Gift card payment failed." };
     }
