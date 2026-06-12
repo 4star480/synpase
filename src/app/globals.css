@@ -1,0 +1,479 @@
+@import "tailwindcss";
+
+:root {
+  --background: #06080f;
+  --surface: #0f1420;
+  --surface-2: #161d2e;
+  --border: #243044;
+  --foreground: #f4f6fb;
+  --muted: #8b95a8;
+  --accent: #f5a623;
+  --accent-hover: #e8940f;
+  --accent-2: #3b9eff;
+  --success: #2ecc71;
+  --warning: #f5c542;
+  --rating: #ff5c5c;
+  --buy: #2ecc71;
+  --ease-smooth: cubic-bezier(0.32, 0.72, 0, 1);
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-surface: var(--surface);
+  --color-surface-2: var(--surface-2);
+  --color-border-dim: var(--border);
+  --color-foreground: var(--foreground);
+  --color-muted: var(--muted);
+  --color-accent: var(--accent);
+  --color-accent-hover: var(--accent-hover);
+  --color-accent-2: var(--accent-2);
+  --color-success: var(--success);
+  --color-warning: var(--warning);
+  --color-rating: var(--rating);
+  --color-buy: var(--buy);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+}
+
+html {
+  scroll-behavior: smooth;
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-geist-sans), system-ui, sans-serif;
+  -webkit-tap-highlight-color: transparent;
+  overscroll-behavior-y: none;
+}
+
+.safe-top {
+  padding-top: env(safe-area-inset-top, 0px);
+}
+
+.safe-bottom {
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+
+.touch-target {
+  min-height: 44px;
+  min-width: 44px;
+}
+
+/* Shared mobile bottom tab bar offset */
+:root {
+  --mobile-tab-height: calc(4.25rem + env(safe-area-inset-bottom, 0px));
+}
+
+.mobile-above-tab-bar {
+  bottom: var(--mobile-tab-height);
+  z-index: 55;
+}
+
+/* ── Checkout payment (native radios — reliable on mobile) ── */
+.checkout-pay-root {
+  isolation: isolate;
+}
+
+.checkout-method-option,
+.checkout-crypto-option {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  min-height: 48px;
+  border: 1px solid var(--border);
+  border-radius: 0.75rem;
+  padding: 0.75rem 0.875rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
+  -webkit-user-select: none;
+  background: var(--surface);
+  transition:
+    border-color 0.15s ease,
+    background-color 0.15s ease,
+    color 0.15s ease,
+    transform 0.1s ease;
+}
+
+.checkout-crypto-option {
+  min-height: 44px;
+  padding: 0.625rem 0.75rem;
+}
+
+.checkout-method-option:active,
+.checkout-crypto-option:active {
+  transform: scale(0.98);
+}
+
+.checkout-method-option input,
+.checkout-crypto-option input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.checkout-method-option:has(input:checked),
+.checkout-crypto-option:has(input:checked) {
+  border-color: var(--accent);
+  background: color-mix(in srgb, var(--accent) 15%, transparent);
+  color: var(--accent);
+}
+
+.checkout-panel--gift,
+.checkout-submit--gift,
+.checkout-preview-btn {
+  display: none;
+}
+
+.checkout-pay-root:has(#checkout-method-gift:checked) .checkout-panel--crypto {
+  display: none;
+}
+
+.checkout-pay-root:has(#checkout-method-gift:checked) .checkout-panel--gift {
+  display: block;
+}
+
+.checkout-pay-root:has(#checkout-method-gift:checked) .checkout-submit--crypto {
+  display: none;
+}
+
+.checkout-pay-root:has(#checkout-method-gift:checked) .checkout-submit--gift {
+  display: block;
+}
+
+.checkout-pay-root:has(#checkout-method-gift:checked) .checkout-preview-btn {
+  display: inline-block;
+}
+
+/* ── Mobile menu (checkbox + label — works before React hydrates) ── */
+.mobile-menu-root {
+  position: fixed;
+  top: 0;
+  right: 0;
+  z-index: 10000;
+  width: 0;
+  height: 0;
+  overflow: visible;
+  pointer-events: none;
+}
+
+.mobile-menu-spacer {
+  flex-shrink: 0;
+  width: 2.75rem;
+  height: 2.75rem;
+}
+
+.mobile-menu-check {
+  position: fixed;
+  left: -9999px;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.mobile-menu-trigger {
+  display: none;
+  place-items: center;
+  width: 2.75rem;
+  height: 2.75rem;
+  min-width: 44px;
+  min-height: 44px;
+  border-radius: 0.75rem;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--foreground);
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+  cursor: pointer;
+  user-select: none;
+  -webkit-user-select: none;
+  pointer-events: auto;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.25);
+}
+
+.mobile-menu-icon--close {
+  display: none;
+}
+
+.mobile-menu-check:checked ~ .mobile-menu-trigger {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.mobile-menu-check:checked ~ .mobile-menu-trigger .mobile-menu-icon--open {
+  display: none;
+}
+
+.mobile-menu-check:checked ~ .mobile-menu-trigger .mobile-menu-icon--close {
+  display: block;
+}
+
+@media (max-width: 1023px) {
+  .mobile-menu-trigger {
+    position: fixed;
+    z-index: 10002;
+    display: grid;
+    top: calc(env(safe-area-inset-top, 0px) + 0.5rem);
+    right: max(1rem, env(safe-area-inset-right, 0px));
+    pointer-events: auto;
+  }
+}
+
+@media (min-width: 1024px) {
+  .mobile-menu-root,
+  .mobile-menu-spacer {
+    display: none !important;
+  }
+}
+
+.mobile-menu-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 10001;
+  display: none;
+  visibility: hidden;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s var(--ease-smooth), visibility 0.2s;
+}
+
+.mobile-menu-check:checked ~ .mobile-menu-overlay {
+  display: block;
+  visibility: visible;
+  opacity: 1;
+  pointer-events: auto;
+}
+
+@media (max-width: 1023px) {
+  .mobile-menu-root {
+    display: block;
+  }
+}
+
+.mobile-menu-backdrop {
+  position: absolute;
+  inset: 0;
+  display: block;
+  border: 0;
+  margin: 0;
+  padding: 0;
+  background: rgba(0, 0, 0, 0.65);
+  touch-action: manipulation;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.mobile-menu-panel {
+  position: fixed;
+  inset-block: 0;
+  right: 0;
+  z-index: 1;
+  display: flex;
+  width: min(100vw - 2.5rem, 20rem);
+  flex-direction: column;
+  border-left: 1px solid var(--border);
+  background: var(--surface);
+  box-shadow: -8px 0 40px rgba(0, 0, 0, 0.45);
+  padding-top: env(safe-area-inset-top, 0px);
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+  animation: slide-in-right 0.28s var(--ease-smooth);
+  pointer-events: auto;
+  touch-action: manipulation;
+}
+
+/* ── Space hero background ── */
+.space-hero {
+  background:
+    radial-gradient(ellipse 120% 80% at 50% 100%, rgba(30, 80, 140, 0.35), transparent 55%),
+    radial-gradient(ellipse 60% 40% at 20% 10%, rgba(120, 60, 200, 0.12), transparent),
+    radial-gradient(ellipse 50% 35% at 80% 15%, rgba(245, 166, 35, 0.08), transparent),
+    radial-gradient(1px 1px at 10% 20%, rgba(255, 255, 255, 0.4), transparent),
+    radial-gradient(1px 1px at 30% 60%, rgba(255, 255, 255, 0.3), transparent),
+    radial-gradient(1px 1px at 70% 30%, rgba(255, 255, 255, 0.35), transparent),
+    radial-gradient(1px 1px at 90% 70%, rgba(255, 255, 255, 0.25), transparent),
+    radial-gradient(1px 1px at 50% 45%, rgba(255, 255, 255, 0.2), transparent),
+    linear-gradient(180deg, #06080f 0%, #0a1020 40%, #0d1830 100%);
+}
+
+.hero-swirl {
+  background: conic-gradient(from 180deg, #3b9eff, #2ecc71, #f5c542, #ff5c5c, #a855f7, #3b9eff);
+  filter: blur(40px);
+  opacity: 0.35;
+}
+
+@media (max-width: 640px) {
+  .hero-swirl {
+    display: none;
+  }
+}
+
+/* ── Gradient search border ── */
+.search-glow {
+  padding: 2px;
+  border-radius: 9999px;
+  background: linear-gradient(90deg, #2ecc71, #f5c542, #f5a623, #ff5c5c);
+}
+
+.search-glow-inner {
+  border-radius: 9999px;
+  background: var(--surface);
+}
+
+/* ── Game marketplace card ── */
+.game-hub-card {
+  position: relative;
+  overflow: hidden;
+  border-radius: 12px;
+  background: linear-gradient(145deg, #1a2236 0%, #12182a 100%);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  transition:
+    transform 0.22s var(--ease-smooth),
+    box-shadow 0.22s var(--ease-smooth),
+    border-color 0.22s var(--ease-smooth);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .game-hub-card:hover {
+    transform: translateY(-4px);
+    border-color: rgba(245, 166, 35, 0.35);
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.45), 0 0 0 1px rgba(245, 166, 35, 0.1);
+  }
+}
+
+.game-hub-card:active {
+  transform: scale(0.985);
+  transition-duration: 0.1s;
+}
+
+/* ── Review gradient card ── */
+.review-gradient-card {
+  background: linear-gradient(135deg, #1a2236 0%, #12182a 60%, rgba(46, 204, 113, 0.08) 100%);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+/* ── Footer glow trails ── */
+.footer-glow {
+  background:
+    radial-gradient(ellipse 40% 60% at 0% 100%, rgba(46, 204, 113, 0.08), transparent),
+    radial-gradient(ellipse 40% 60% at 100% 100%, rgba(255, 92, 92, 0.08), transparent),
+    var(--surface);
+}
+
+/* ── Horizontal scroll (carousels, filters) ── */
+.scroll-touch {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior-x: contain;
+  scroll-behavior: smooth;
+}
+
+.scroll-touch a {
+  touch-action: manipulation;
+}
+
+.scroll-fade-edges {
+  mask-image: linear-gradient(to right, transparent, black 12px, black calc(100% - 12px), transparent);
+}
+
+@keyframes marquee {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
+
+@keyframes fade-in {
+  from { opacity: 0; transform: translateY(-6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes slide-in-right {
+  from { transform: translateX(100%); }
+  to { transform: translateX(0); }
+}
+
+@keyframes slide-in-up {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes pop {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.2); }
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-6px); }
+}
+
+.animate-marquee {
+  animation: marquee 40s linear infinite;
+}
+
+.animate-fade-in {
+  animation: fade-in 0.25s var(--ease-smooth);
+}
+
+.animate-slide-in-right {
+  animation: slide-in-right 0.28s var(--ease-smooth);
+}
+
+.animate-slide-in-up {
+  animation: slide-in-up 0.35s var(--ease-smooth) backwards;
+}
+
+.animate-pop {
+  animation: pop 0.3s var(--ease-smooth);
+}
+
+.animate-float {
+  animation: float 3s ease-in-out infinite;
+}
+
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  .animate-marquee,
+  .animate-float,
+  .hero-swirl {
+    animation: none !important;
+  }
+
+  .animate-fade-in,
+  .animate-slide-in-right,
+  .animate-slide-in-up {
+    animation: none;
+  }
+
+  .game-hub-card {
+    transition: none;
+  }
+
+  .game-hub-card:active {
+    transform: none;
+  }
+}

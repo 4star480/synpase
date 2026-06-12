@@ -1,0 +1,253 @@
+generator client {
+
+  provider = "prisma-client-js"
+
+}
+
+
+
+datasource db {
+
+  provider = "sqlite"
+
+  url      = env("DATABASE_URL")
+
+}
+
+
+
+model User {
+
+  id           String    @id @default(cuid())
+
+  email        String    @unique
+
+  username     String    @unique
+
+  passwordHash String
+
+  bio          String    @default("")
+
+  avatarHue    Int       @default(220)
+
+  verified     Boolean   @default(false)
+
+  role         String    @default("USER") // USER | ADMIN
+
+  memberSince  DateTime  @default(now())
+
+  listings     Listing[]
+
+  orders       Order[]   @relation("BuyerOrders")
+
+  reviews      Review[]  @relation("SellerReviews")
+
+  written      Review[]  @relation("AuthorReviews")
+
+}
+
+
+
+model Game {
+
+  id         String    @id @default(cuid())
+
+  name       String    @unique
+
+  slug       String    @unique
+
+  emoji      String    @default("🎮")
+
+  tagline    String    @default("")
+
+  bannerFrom String    @default("#6366f1")
+
+  bannerTo   String    @default("#312e81")
+
+  coverImage String    @default("")
+
+  listings   Listing[]
+
+}
+
+
+
+model Listing {
+
+  id           String   @id @default(cuid())
+
+  title        String
+
+  description  String
+
+  category     String // ACCOUNT | CURRENCY | ITEM | BOOSTING
+
+  priceCents   Int
+
+  stock        Int      @default(1)
+
+  deliveryMins Int      @default(60)
+
+  status       String   @default("ACTIVE") // ACTIVE | SOLD_OUT | PAUSED
+
+  featured     Boolean  @default(false)
+
+  views        Int      @default(0)
+
+  imagePath    String   @default("")
+
+  createdAt    DateTime @default(now())
+
+  game         Game     @relation(fields: [gameId], references: [id])
+
+  gameId       String
+
+  seller       User     @relation(fields: [sellerId], references: [id])
+
+  sellerId     String
+
+  orders       Order[]
+
+
+
+  @@index([gameId, category, status])
+
+  @@index([status, featured])
+
+}
+
+
+
+model Order {
+
+  id            String    @id @default(cuid())
+
+  listing       Listing   @relation(fields: [listingId], references: [id])
+
+  listingId     String
+
+  buyer         User      @relation("BuyerOrders", fields: [buyerId], references: [id])
+
+  buyerId       String
+
+  priceCents    Int
+
+  status        String    @default("PENDING") // PENDING | DELIVERED | COMPLETED | DISPUTED | CANCELLED
+
+  paymentMethod String?   // CRYPTO | GIFT_CARD | CARD
+
+  paymentStatus String    @default("UNPAID") // UNPAID | AWAITING | PAID | FAILED | REFUNDED
+
+  createdAt     DateTime  @default(now())
+
+  review        Review?
+
+  payment       Payment?
+
+}
+
+
+
+model Payment {
+
+  id              String    @id @default(cuid())
+
+  order           Order     @relation(fields: [orderId], references: [id], onDelete: Cascade)
+
+  orderId         String    @unique
+
+  method          String    // CRYPTO | GIFT_CARD | CARD
+
+  status          String    @default("PENDING") // PENDING | AWAITING | COMPLETED | FAILED | EXPIRED
+
+  amountCents     Int
+
+  currency        String    @default("USD")
+
+  cryptoCurrency  String?
+
+  cryptoAmount    String?
+
+  cryptoAddress   String?
+
+  cryptoInvoiceId String?
+
+  cryptoTxHash    String?
+
+  expiresAt       DateTime?
+
+  giftCardId      String?
+
+  giftCard        GiftCard? @relation(fields: [giftCardId], references: [id])
+
+  giftCardCode    String?
+
+  processorRef    String?
+
+  failureReason   String?
+
+  createdAt       DateTime  @default(now())
+
+  completedAt     DateTime?
+
+
+
+  @@index([status, method])
+
+  @@index([cryptoInvoiceId])
+
+}
+
+
+
+model GiftCard {
+
+  id                  String    @id @default(cuid())
+
+  code                String    @unique
+
+  balanceCents        Int
+
+  initialBalanceCents Int
+
+  currency            String    @default("USD")
+
+  active              Boolean   @default(true)
+
+  expiresAt           DateTime?
+
+  label               String    @default("")
+
+  createdAt           DateTime  @default(now())
+
+  payments            Payment[]
+
+}
+
+
+
+model Review {
+
+  id        String   @id @default(cuid())
+
+  order     Order    @relation(fields: [orderId], references: [id])
+
+  orderId   String   @unique
+
+  seller    User     @relation("SellerReviews", fields: [sellerId], references: [id])
+
+  sellerId  String
+
+  author    User     @relation("AuthorReviews", fields: [authorId], references: [id])
+
+  authorId  String
+
+  rating    Int
+
+  comment   String   @default("")
+
+  createdAt DateTime @default(now())
+
+}
+
+
