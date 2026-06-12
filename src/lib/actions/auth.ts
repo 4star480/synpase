@@ -5,7 +5,7 @@ import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { createSession, destroySession } from "@/lib/session";
 
-export type AuthState = { error?: string };
+export type AuthState = { error?: string; email?: string };
 
 function safeRedirect(path: string): string {
   if (!path.startsWith("/") || path.startsWith("//")) return "/";
@@ -50,7 +50,7 @@ export async function login(_prev: AuthState, formData: FormData): Promise<AuthS
 
   const user = await prisma.user.findUnique({ where: { email } });
   if (!user || !(await bcrypt.compare(password, user.passwordHash))) {
-    return { error: "Invalid email or password." };
+    return { error: "Invalid email or password.", email };
   }
 
   const redirectTo = safeRedirect(String(formData.get("redirect") ?? ""));
@@ -67,7 +67,7 @@ export async function adminLogin(_prev: AuthState, formData: FormData): Promise<
 
   const user = await prisma.user.findUnique({ where: { email } });
   if (!user || user.role !== "ADMIN" || !(await bcrypt.compare(password, user.passwordHash))) {
-    return { error: "Invalid admin credentials." };
+    return { error: "Invalid admin credentials.", email };
   }
 
   await createSession(user.id, user.role);

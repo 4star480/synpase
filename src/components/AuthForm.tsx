@@ -46,10 +46,19 @@ export function AuthForm({
             <label key={f.name} className="block">
               <span className="mb-1.5 block text-sm font-medium">{f.label}</span>
               <input
+                key={
+                  f.name === "password"
+                    ? `password-${state.error ?? "initial"}`
+                    : f.name === "email"
+                      ? `email-${state.email ?? "initial"}`
+                      : f.name
+                }
                 name={f.name}
                 type={f.type}
                 placeholder={f.placeholder}
+                defaultValue={f.name === "email" ? state.email : undefined}
                 required
+                autoComplete={f.name === "email" ? "email" : f.name === "password" ? "current-password" : undefined}
                 className="w-full rounded-lg border border-border-dim bg-background px-3 py-2.5 text-base outline-none placeholder:text-muted focus:border-accent sm:text-sm"
               />
             </label>
