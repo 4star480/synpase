@@ -109,7 +109,7 @@ export function CheckoutForm({
             Enter your gift card code
           </label>
           <p className="mt-1 text-xs text-muted">
-            Amazon, Steam, PlayStation, Xbox, Nintendo, Google Play, Apple, Roblox, and more.
+            Amazon, Apple Gift Card, Xbox, PlayStation, Steam, Paysafecard, Razer Gold, Nintendo, Google Play, and more.
           </p>
 
           <input

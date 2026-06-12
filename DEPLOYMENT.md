@@ -11,7 +11,7 @@ The admin UI is **not linked** from the public storefront (by design).
 
 After the database is seeded, sign in with:
 
-- **Email:** `admin@gametrade.com`
+- **Email:** `admin@synpase.com`
 - **Password:** value from `ADMIN_PASSWORD` when you ran seed (default `admin123456` if unset)
 
 Change the password immediately on a live site by updating the user in the database or re-seeding with a strong `ADMIN_PASSWORD`.

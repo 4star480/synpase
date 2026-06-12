@@ -1,7 +1,7 @@
 import { PrismaClient } from "@prisma/client";
 
 const prisma = new PrismaClient();
-const ADMIN_EMAIL = "admin@gametrade.com";
+import { ADMIN_EMAIL } from "../src/lib/brand";
 
 async function main() {
   const admin = await prisma.user.findUnique({ where: { email: ADMIN_EMAIL } });

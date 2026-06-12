@@ -2,6 +2,7 @@ import { PrismaClient, type Prisma } from "@prisma/client";
 import bcrypt from "bcryptjs";
 import { randomUUID } from "crypto";
 import { join } from "path";
+import { ADMIN_EMAIL } from "../src/lib/brand";
 import { GAMES, generateCatalogListings } from "./catalog-data";
 import { downloadAllImages } from "./download-images";
 import { gameCoverPublicPath } from "../src/lib/svg-art";
@@ -52,7 +53,7 @@ async function main() {
   const admin = await prisma.user.create({
     data: {
       username: "GameTradeAdmin",
-      email: "admin@gametrade.com",
+      email: ADMIN_EMAIL,
       passwordHash: adminHash,
       role: "ADMIN",
       bio: "Platform administrator",
@@ -60,7 +61,7 @@ async function main() {
       verified: true,
     },
   });
-  console.log(`Admin account: admin@gametrade.com (password from ADMIN_PASSWORD or default)`);
+  console.log(`Admin account: ${ADMIN_EMAIL} (password from ADMIN_PASSWORD or default)`);
 
   console.log("Generating", TARGET_LISTINGS, "listings...");
   const catalog = generateCatalogListings(TARGET_LISTINGS);

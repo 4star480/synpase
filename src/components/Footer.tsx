@@ -13,7 +13,19 @@ const POPULAR = [
   { label: "BDO Silver", href: "/browse?game=black-desert-online&category=CURRENCY" },
 ];
 
-const PAYMENTS = ["Bitcoin", "Ethereum", "USDT", "Litecoin", "Amazon", "Steam", "PlayStation", "Xbox", "Gift card"];
+const PAYMENTS = [
+  "Bitcoin",
+  "Ethereum",
+  "USDT",
+  "Litecoin",
+  "Amazon",
+  "Apple",
+  "Xbox",
+  "Paysafecard",
+  "Razer Gold",
+  "Steam",
+  "PlayStation",
+];
 
 export function Footer() {
   return (

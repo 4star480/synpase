@@ -1,5 +1,6 @@
 import { AuthForm } from "@/components/AuthForm";
 import { Logo } from "@/components/Logo";
+import { ADMIN_EMAIL } from "@/lib/brand";
 import { adminLogin } from "@/lib/actions/auth";
 
 export const metadata = { title: "Admin login" };
@@ -16,7 +17,7 @@ export default function AdminLoginPage() {
         title="Sign in"
         subtitle="Admin credentials only."
         fields={[
-          { name: "email", label: "Email", type: "email", placeholder: "Enter admin email" },
+          { name: "email", label: "Email", type: "email", placeholder: ADMIN_EMAIL },
           { name: "password", label: "Password", type: "password", placeholder: "••••••••" },
         ]}
         submitLabel="Enter admin"
