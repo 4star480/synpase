@@ -23,13 +23,13 @@ npm run dev
 
 Open http://localhost:3000.
 
-Copy the environment template and edit if needed:
+Copy the environment template and start PostgreSQL:
 
 ```bash
-cp .env.example .env
+cp .env.example .env          # PowerShell: Copy-Item .env.example .env
+docker compose up -d
+npm run db:deploy
 ```
-
-On Windows PowerShell: `Copy-Item .env.example .env`
 
 ### Admin panel
 

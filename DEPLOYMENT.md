@@ -35,37 +35,46 @@ Copy `.env.example` and fill in values before building.
 
 ---
 
-## Database options
+## Netlify (recommended)
 
-### Option A — SQLite (simple VPS / Railway with persistent disk)
+SQLite **does not work** on Netlify. Use **PostgreSQL** (free tier from [Neon](https://neon.tech)).
 
-Works for a single server with a persistent filesystem.
+### 1. Netlify environment variables
 
-```env
-DATABASE_URL="file:./prisma/dev.db"
+In **Site configuration → Environment variables**, add:
+
+| Variable | Example |
+|----------|---------|
+| `DATABASE_URL` | `postgresql://user:pass@ep-xxx.neon.tech/neondb?sslmode=require` |
+| `SESSION_SECRET` | 32+ random characters |
+| `NEXT_PUBLIC_SITE_URL` | `https://stoned-pasca-8ede74.netlify.app` |
+
+### 2. Seed the production database (once)
+
+From your PC, with the Neon connection string:
+
+```bash
+DATABASE_URL="postgresql://..." ADMIN_PASSWORD="YourStrongPassword" npm run db:deploy
 ```
 
-Keep `provider = "sqlite"` in `prisma/schema.prisma`.
+### 3. Redeploy
 
-**Not supported on Vercel** (no persistent disk).
+Trigger **Deploys → Trigger deploy → Clear cache and deploy site**.
 
-### Option B — PostgreSQL (Vercel, Neon, Supabase, Docker)
+Admin panel: `https://YOUR-SITE.netlify.app/admin/login`
 
-1. Create a free [Neon](https://neon.tech) or [Supabase](https://supabase.com) database.
-2. In `prisma/schema.prisma`, change:
-   ```prisma
-   provider = "postgresql"
-   ```
-3. Set:
-   ```env
-   DATABASE_URL="postgresql://USER:PASSWORD@HOST/DATABASE?sslmode=require"
-   ```
+---
+
+## Database
+
+This project uses **PostgreSQL** (`prisma/schema.prisma`).
 
 Local Postgres via Docker:
 
 ```bash
 docker compose up -d
 # DATABASE_URL="postgresql://gametrade:gametrade@localhost:5432/gametrade"
+npm run db:deploy
 ```
 
 ---
