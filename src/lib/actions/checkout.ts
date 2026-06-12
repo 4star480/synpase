@@ -4,8 +4,7 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { getSessionUserId } from "@/lib/session";
 import { startCheckout } from "@/lib/payments/checkout";
-import { validateGiftCard } from "@/lib/payments/gift-card";
-import { formatPrice } from "@/lib/format";
+import { validateGiftCardCodeInput } from "@/lib/payments/gift-card";
 import type { CryptoCurrencyId, PaymentMethod } from "@/lib/payments/types";
 
 export type CheckoutFormState = {
@@ -38,10 +37,10 @@ export async function processCheckout(
     }
     const listing = await prismaListingPrice(listingId);
     if (!listing) return { error: "Listing not found." };
-    const validation = await validateGiftCard(giftCardCode, listing.priceCents);
-    if (validation.valid && validation.balanceCents != null) {
+    const validation = validateGiftCardCodeInput(giftCardCode);
+    if (validation.valid) {
       return {
-        giftPreview: `Balance ${formatPrice(validation.balanceCents)} — ready to pay`,
+        giftPreview: "Code accepted — submit to complete payment",
         giftPreviewOk: true,
       };
     }
@@ -73,7 +72,7 @@ export async function previewGiftCard(listingId: string, code: string) {
   const listing = await prismaListingPrice(listingId);
   if (!listing) return { valid: false, error: "Listing not found." };
 
-  return validateGiftCard(code, listing.priceCents);
+  return validateGiftCardCodeInput(code);
 }
 
 async function prismaListingPrice(listingId: string) {

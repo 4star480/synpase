@@ -1,44 +1,23 @@
-import { prisma } from "@/lib/prisma";
-import { giftCardCodePattern, normalizeGiftCardCode } from "./config";
+import { normalizeGiftCardCode } from "./config";
 import type { GiftCardValidation } from "./types";
 
 export function maskGiftCardCode(code: string): string {
-  const parts = code.split("-");
-  if (parts.length >= 3) return `${parts[0]}-****-****`;
-  return "****";
+  if (code.length <= 4) return "****";
+  return `••••${code.slice(-4)}`;
 }
 
-export async function validateGiftCard(codeRaw: string, amountCents: number): Promise<GiftCardValidation> {
+/** Validate a buyer-entered gift card code (format only — no balance lookup). */
+export function validateGiftCardCodeInput(codeRaw: string): GiftCardValidation {
   const code = normalizeGiftCardCode(codeRaw);
-  if (!giftCardCodePattern().test(code)) {
-    return { valid: false, error: "Invalid code format. Example: AMAZON-100-K7M2" };
+  if (code.length < 8) {
+    return { valid: false, error: "Enter a gift card code (at least 8 characters)." };
+  }
+  if (code.length > 64) {
+    return { valid: false, error: "Gift card code is too long." };
+  }
+  if (!/^[A-Z0-9-]+$/.test(code)) {
+    return { valid: false, error: "Code can only contain letters, numbers, and dashes." };
   }
 
-  const card = await prisma.giftCard.findUnique({ where: { code } });
-  if (!card || !card.active) {
-    return { valid: false, error: "Gift card not found or inactive." };
-  }
-  if (card.expiresAt && card.expiresAt < new Date()) {
-    return { valid: false, error: "This gift card has expired." };
-  }
-  if (card.balanceCents < amountCents) {
-    return {
-      valid: false,
-      error: `Insufficient balance. Card has $${(card.balanceCents / 100).toFixed(2)} available.`,
-      balanceCents: card.balanceCents,
-    };
-  }
-
-  return {
-    valid: true,
-    balanceCents: card.balanceCents,
-    maskedCode: maskGiftCardCode(code),
-  };
-}
-
-export function generateGiftCardCode(): string {
-  const chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
-  const block = () =>
-    Array.from({ length: 4 }, () => chars[Math.floor(Math.random() * chars.length)]).join("");
-  return `GIFT-${block()}-${block()}`;
+  return { valid: true, maskedCode: maskGiftCardCode(code) };
 }

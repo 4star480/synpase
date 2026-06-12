@@ -12,7 +12,7 @@ const LINKS = [
   { href: "/admin/listings/new", label: "Add product", icon: "➕" },
   { href: "/admin/orders", label: "Orders", icon: "🧾" },
   { href: "/admin/payments", label: "Payments", icon: "💳" },
-  { href: "/admin/gift-cards", label: "Gift cards", icon: "🎁" },
+  { href: "/admin/gift-cards", label: "Gift card codes", icon: "🎁" },
   { href: "/admin/users", label: "Users", icon: "👥" },
 ];
 

@@ -1,7 +1,7 @@
 import { prisma } from "@/lib/prisma";
 import { createCryptoInvoice } from "./crypto-invoice";
 import { normalizeGiftCardCode } from "./config";
-import { maskGiftCardCode, validateGiftCard } from "./gift-card";
+import { validateGiftCardCodeInput } from "./gift-card";
 import type { CryptoCurrencyId, PaymentMethod } from "./types";
 
 export type CheckoutResult =
@@ -30,21 +30,13 @@ export async function startCheckout(opts: {
 
   if (opts.method === "GIFT_CARD") {
     const code = normalizeGiftCardCode(opts.giftCardCode ?? "");
-    const validation = await validateGiftCard(code, listing.priceCents);
+    const validation = validateGiftCardCodeInput(code);
     if (!validation.valid) {
       return { ok: false, error: validation.error ?? "Invalid gift card." };
     }
 
     try {
       const order = await prisma.$transaction(async (tx) => {
-        const card = await tx.giftCard.findUnique({ where: { code } });
-        if (!card || !card.active || card.balanceCents < listing.priceCents) {
-          throw new Error("Gift card balance changed. Please try again.");
-        }
-        if (card.expiresAt && card.expiresAt < new Date()) {
-          throw new Error("Gift card expired.");
-        }
-
         const o = await tx.order.create({
           data: {
             listingId: listing.id,
@@ -62,15 +54,9 @@ export async function startCheckout(opts: {
             method: "GIFT_CARD",
             status: "COMPLETED",
             amountCents: listing.priceCents,
-            giftCardId: card.id,
-            giftCardCode: maskGiftCardCode(code),
+            giftCardCode: code,
             completedAt: new Date(),
           },
-        });
-
-        await tx.giftCard.update({
-          where: { id: card.id },
-          data: { balanceCents: { decrement: listing.priceCents } },
         });
 
         await tx.listing.update({

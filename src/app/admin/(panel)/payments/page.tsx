@@ -2,7 +2,6 @@ import Link from "next/link";
 import { adminPayments } from "@/lib/admin-queries";
 import {
   formatPrice,
-  maskCode,
   paymentMethodLabel,
   paymentRecordStatusLabel,
   paymentStatusLabel,
@@ -103,9 +102,7 @@ export default async function AdminPaymentsPage({
                     </>
                   )}
                   {p.method === "GIFT_CARD" && (
-                    <p>
-                      {p.giftCard?.label || "Gift card"} · {maskCode(p.giftCardCode ?? p.giftCard?.code)}
-                    </p>
+                    <p className="font-mono">{p.giftCardCode ?? "—"}</p>
                   )}
                   {p.failureReason && <p className="text-rose-400">{p.failureReason}</p>}
                   {!p.cryptoCurrency && !p.giftCardCode && !p.failureReason && "—"}

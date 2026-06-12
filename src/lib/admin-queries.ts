@@ -57,6 +57,35 @@ export async function adminListings(page = 1, q = "") {
   return { rows, total, page, perPage, totalPages: Math.ceil(total / perPage) };
 }
 
+export async function adminGiftCardPayments(page = 1) {
+  const perPage = 25;
+  const [rows, total] = await Promise.all([
+    prisma.payment.findMany({
+      where: { method: "GIFT_CARD" },
+      include: {
+        order: {
+          include: {
+            buyer: { select: { username: true, email: true } },
+            listing: {
+              select: {
+                id: true,
+                title: true,
+                game: { select: { emoji: true } },
+              },
+            },
+          },
+        },
+      },
+      orderBy: { createdAt: "desc" },
+      skip: (page - 1) * perPage,
+      take: perPage,
+    }),
+    prisma.payment.count({ where: { method: "GIFT_CARD" } }),
+  ]);
+
+  return { rows, total, page, perPage, totalPages: Math.ceil(total / perPage) };
+}
+
 export async function adminPayments(page = 1) {
   const perPage = 25;
   const [rows, total, completedAgg] = await Promise.all([
@@ -74,7 +103,6 @@ export async function adminPayments(page = 1) {
             },
           },
         },
-        giftCard: { select: { code: true, label: true } },
       },
       orderBy: { createdAt: "desc" },
       skip: (page - 1) * perPage,

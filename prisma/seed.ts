@@ -62,31 +62,6 @@ async function main() {
   });
   console.log(`Admin account: admin@gametrade.com (password from ADMIN_PASSWORD or default)`);
 
-  console.log("Seeding gift cards...");
-  const giftCards = [
-    { code: "AMAZON-100-K7M2", balanceCents: 10000, label: "Amazon $100" },
-    { code: "AMAZON-50-R4T9", balanceCents: 5000, label: "Amazon $50" },
-    { code: "STEAM-50-G8P3", balanceCents: 5000, label: "Steam $50" },
-    { code: "STEAM-20-N2W6", balanceCents: 2000, label: "Steam $20" },
-    { code: "PLAYSTATION-50-B5H1", balanceCents: 5000, label: "PlayStation $50" },
-    { code: "XBOX-25-D3J8", balanceCents: 2500, label: "Xbox $25" },
-    { code: "NINTENDO-35-Q9L4", balanceCents: 3500, label: "Nintendo $35" },
-    { code: "GOOGLE-25-F6V2", balanceCents: 2500, label: "Google Play $25" },
-    { code: "APPLE-50-C8X7", balanceCents: 5000, label: "Apple $50" },
-    { code: "ROBLOX-25-H2M9", balanceCents: 2500, label: "Roblox $25" },
-  ];
-  for (const g of giftCards) {
-    await prisma.giftCard.create({
-      data: {
-        code: g.code,
-        balanceCents: g.balanceCents,
-        initialBalanceCents: g.balanceCents,
-        label: g.label,
-        expiresAt: new Date(Date.now() + 365 * 86400000),
-      },
-    });
-  }
-
   console.log("Generating", TARGET_LISTINGS, "listings...");
   const catalog = generateCatalogListings(TARGET_LISTINGS);
   const rows: Prisma.ListingCreateManyInput[] = [];
