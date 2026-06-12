@@ -23,13 +23,13 @@ npm run dev
 
 Open http://localhost:3000.
 
-Create a `.env` file with:
+Copy the environment template and edit if needed:
 
+```bash
+cp .env.example .env
 ```
-DATABASE_URL="file:./dev.db"
-SESSION_SECRET="your-random-secret-at-least-32-chars"
-NEXT_PUBLIC_SITE_URL="http://localhost:3000"
-```
+
+On Windows PowerShell: `Copy-Item .env.example .env`
 
 ### Admin panel
 
