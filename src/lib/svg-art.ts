@@ -73,7 +73,7 @@ export function categoryCoverSvg(category: string): string {
   <circle cx="120" cy="320" r="80" fill="${meta.accent}" opacity="0.1"/>
   <text x="320" y="170" text-anchor="middle" font-size="80">${meta.icon}</text>
   <text x="320" y="240" text-anchor="middle" font-size="32" fill="white" font-family="system-ui,sans-serif" font-weight="800">${escapeXml(meta.label)}</text>
-  <text x="320" y="280" text-anchor="middle" font-size="14" fill="white" font-family="system-ui,sans-serif" opacity="0.5">Synapse GameShop</text>
+  <text x="320" y="280" text-anchor="middle" font-size="14" fill="white" font-family="system-ui,sans-serif" opacity="0.5">Synpase GameShop</text>
 </svg>`;
 }
 

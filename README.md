@@ -1,4 +1,4 @@
-# GameTrade
+# Synpase GameShop
 
 A player-to-player gaming marketplace: buy and sell game accounts, in-game currency, items, and boosting services. Built with Next.js (App Router), Tailwind CSS, Prisma, and SQLite.
 

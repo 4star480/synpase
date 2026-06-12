@@ -1,11 +1,11 @@
 import Link from "next/link";
 import { SITE_NAME, SITE_NAME_SHORT } from "@/lib/brand";
-import { SynapseLogoMark } from "./SynapseLogoMark";
+import { SynpaseLogoMark } from "./SynpaseLogoMark";
 
 export function Logo({ compact = false }: { compact?: boolean }) {
   return (
     <Link href="/" className="group flex shrink-0 items-center gap-2.5" aria-label={SITE_NAME}>
-      <SynapseLogoMark
+      <SynpaseLogoMark
         size={compact ? 32 : 36}
         className="shrink-0 transition group-hover:drop-shadow-[0_0_10px_rgba(245,166,35,0.45)]"
       />

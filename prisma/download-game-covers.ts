@@ -12,7 +12,7 @@ import {
 
 const MIN_BYTES = 2500;
 const DELAY_MS = 120;
-const UA = "SynapseGameShop/1.0 (cover downloader; contact: local)";
+const UA = "SynpaseGameShop/1.0 (cover downloader; contact: local)";
 
 /** Reject known wrong Steam headers for specific slugs */
 const STEAM_APP_REJECT: Record<string, number[]> = {

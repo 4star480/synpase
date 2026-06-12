@@ -5,7 +5,7 @@ import { useEffect, useLayoutEffect, useRef } from "react";
 import { logout } from "@/lib/actions/auth";
 import { Avatar } from "./Avatar";
 
-const MENU_ID = "synapse-mobile-menu";
+const MENU_ID = "synpase-mobile-menu";
 
 const NAV_LINKS = [
   { href: "/browse", label: "Marketplace" },

@@ -1,5 +1,5 @@
-/** Synapse neural-node mark — matches /public/brand/synapse-mark.svg */
-export function SynapseLogoMark({ size = 36, className = "" }: { size?: number; className?: string }) {
+/** Synpase brand mark */
+export function SynpaseLogoMark({ size = 36, className = "" }: { size?: number; className?: string }) {
   return (
     <svg
       width={size}

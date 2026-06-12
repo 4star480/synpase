@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { SITE_NAME_SHORT } from "@/lib/brand";
-import { SynapseLogoMark } from "@/components/SynapseLogoMark";
+import { SynpaseLogoMark } from "@/components/SynpaseLogoMark";
 import { adminLogout } from "@/lib/actions/auth";
 
 const LINKS = [
@@ -22,7 +22,7 @@ export function AdminSidebar({ username }: { username: string }) {
     <aside className="flex w-full flex-col border-b border-border-dim bg-surface lg:fixed lg:inset-y-0 lg:z-40 lg:w-64 lg:border-b-0 lg:border-r">
       <div className="flex items-center justify-between gap-3 px-5 py-4 lg:py-6">
         <div className="flex items-center gap-2">
-          <SynapseLogoMark size={28} />
+          <SynpaseLogoMark size={28} />
           <div>
             <p className="text-xs font-bold uppercase tracking-widest text-accent">Admin</p>
             <p className="font-bold">{SITE_NAME_SHORT}</p>
