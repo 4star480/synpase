@@ -113,8 +113,8 @@ async function searchListingIds(
   const params: (string | number)[] = [];
 
   let sql = `
-    SELECT l.id FROM Listing l
-    INNER JOIN Game g ON l.gameId = g.id
+    SELECT l.id FROM "Listing" l
+    INNER JOIN "Game" g ON l."gameId" = g.id
     WHERE l.status = 'ACTIVE'
   `;
 
@@ -150,12 +150,12 @@ async function searchListingIds(
   const perPage = filters.perPage ?? 48;
   const sort =
     filters.sort === "price-asc"
-      ? "l.priceCents ASC"
+      ? 'l."priceCents" ASC'
       : filters.sort === "price-desc"
-        ? "l.priceCents DESC"
+        ? 'l."priceCents" DESC'
         : filters.sort === "popular"
           ? "l.views DESC"
-          : "l.createdAt DESC";
+          : 'l."createdAt" DESC';
 
   const pageSql = `${sql} ORDER BY ${sort} LIMIT ? OFFSET ?`;
   const rows = await prisma.$queryRawUnsafe<{ id: string }[]>(
@@ -236,8 +236,8 @@ export async function searchSuggestions(q: string, limit = 8) {
   const terms = parsed.terms.length > 0 ? parsed.terms : [trimmed.toLowerCase()];
 
   let sql = `
-    SELECT l.id, l.title, l.category, l.priceCents, g.name as gameName, g.emoji as gameEmoji, g.slug as gameSlug
-    FROM Listing l INNER JOIN Game g ON l.gameId = g.id
+    SELECT l.id, l.title, l.category, l."priceCents", g.name as "gameName", g.emoji as "gameEmoji", g.slug as "gameSlug"
+    FROM "Listing" l INNER JOIN "Game" g ON l."gameId" = g.id
     WHERE l.status = 'ACTIVE'
   `;
   const params: string[] = [];
@@ -319,11 +319,11 @@ export async function allGames(): Promise<GameCard[]> {
       },
     }),
     prisma.$queryRaw<{ gameId: string; avg: number }[]>`
-      SELECT l.gameId, AVG(r.rating) as avg
-      FROM Review r
-      INNER JOIN "Order" o ON r.orderId = o.id
-      INNER JOIN Listing l ON o.listingId = l.id
-      GROUP BY l.gameId
+      SELECT l."gameId", AVG(r.rating) as avg
+      FROM "Review" r
+      INNER JOIN "Order" o ON r."orderId" = o.id
+      INNER JOIN "Listing" l ON o."listingId" = l.id
+      GROUP BY l."gameId"
     `,
   ]);
 
