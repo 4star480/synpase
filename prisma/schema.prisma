@@ -30,6 +30,8 @@ model User {
 
   memberSince  DateTime  @default(now())
 
+  salesCount   Int       @default(0)
+
   listings     Listing[]
 
   orders       Order[]   @relation("BuyerOrders")

@@ -3,7 +3,8 @@ import bcrypt from "bcryptjs";
 import { randomUUID } from "crypto";
 import { join } from "path";
 import { ADMIN_EMAIL } from "../src/lib/brand";
-import { GAMES, generateCatalogListings } from "./catalog-data";
+import { GAMES, generateCatalogListings, SELLERS } from "./catalog-data";
+import { memberSinceForUsername, salesCountForUsername } from "../src/lib/trader-stats";
 import { downloadAllImages } from "./download-images";
 import { gameCoverPublicPath } from "../src/lib/svg-art";
 import { resolveListingImage } from "../src/lib/listing-images";
@@ -63,6 +64,25 @@ async function main() {
   });
   console.log(`Admin account: ${ADMIN_EMAIL} (password from ADMIN_PASSWORD or default)`);
 
+  console.log("Creating trader accounts...");
+  const traderIds: string[] = [];
+  const traderHash = await bcrypt.hash("trader-placeholder", 10);
+  for (const s of SELLERS) {
+    const trader = await prisma.user.create({
+      data: {
+        username: s.username,
+        email: s.email,
+        passwordHash: traderHash,
+        bio: `Trusted ${s.username} — fast delivery & secure trades.`,
+        avatarHue: Math.abs(s.username.charCodeAt(0) * 17) % 360,
+        verified: true,
+        memberSince: memberSinceForUsername(s.username),
+        salesCount: salesCountForUsername(s.username),
+      },
+    });
+    traderIds.push(trader.id);
+  }
+
   console.log("Generating", TARGET_LISTINGS, "listings...");
   const catalog = generateCatalogListings(TARGET_LISTINGS);
   const rows: Prisma.ListingCreateManyInput[] = [];
@@ -78,7 +98,7 @@ async function main() {
       description: c.description,
       category: c.category,
       gameId: game.id,
-      sellerId: admin.id,
+      sellerId: traderIds[i % traderIds.length],
       priceCents: Math.round(c.price * 100),
       stock: c.stock,
       deliveryMins: c.deliveryMins,
@@ -96,7 +116,7 @@ async function main() {
     await prisma.listing.createMany({ data: rows.slice(i, i + BATCH) });
   }
 
-  console.log("Done —", rows.length, "listings, 1 admin account.");
+  console.log("Done —", rows.length, "listings,", traderIds.length, "traders, 1 admin.");
 }
 
 main()

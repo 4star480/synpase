@@ -11,6 +11,7 @@ import { ListingThumbnail } from "@/components/ListingThumbnail";
 import { GameCover } from "@/components/GameCover";
 import { WishlistButton } from "@/components/WishlistButton";
 import { sellerIsOnline } from "@/lib/seller-status";
+import { displaySalesCount } from "@/lib/trader-stats";
 import { BuyButton } from "./BuyButton";
 
 export default async function ListingPage({ params }: { params: Promise<{ id: string }> }) {
@@ -27,6 +28,7 @@ export default async function ListingPage({ params }: { params: Promise<{ id: st
             avatarHue: true,
             verified: true,
             memberSince: true,
+            salesCount: true,
             bio: true,
             reviews: {
               select: {
@@ -184,6 +186,9 @@ export default async function ListingPage({ params }: { params: Promise<{ id: st
             <p className="mt-2 text-xs text-muted">
               Member since{" "}
               {listing.seller.memberSince.toLocaleDateString("en-US", { month: "long", year: "numeric" })}
+              {listing.seller.salesCount > 0 && (
+                <> · {listing.seller.salesCount.toLocaleString()} sales</>
+              )}
             </p>
           </Link>
 

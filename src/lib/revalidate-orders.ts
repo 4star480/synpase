@@ -6,5 +6,4 @@ export function revalidateOrderViews() {
   revalidatePath("/admin");
   revalidatePath("/admin/orders");
   revalidatePath("/admin/payments");
-  revalidatePath("/admin/gift-cards");
 }

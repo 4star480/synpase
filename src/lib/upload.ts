@@ -17,7 +17,13 @@ function extensionForType(type: string): string {
 }
 
 function useBlobStorage(): boolean {
-  return process.env.NETLIFY === "true";
+  if (process.env.USE_LOCAL_UPLOADS === "1") return false;
+  return (
+    process.env.NETLIFY === "true" ||
+    process.env.NETLIFY === "1" ||
+    Boolean(process.env.AWS_LAMBDA_FUNCTION_NAME) ||
+    Boolean(process.env.NETLIFY_BLOBS_CONTEXT)
+  );
 }
 
 function safeFilename(filename: string): string | null {

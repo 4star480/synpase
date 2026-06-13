@@ -33,6 +33,14 @@ const PAYMENT_STATUS_LABELS: Record<string, string> = {
   REFUNDED: "Refunded",
 };
 
+const ORDER_STATUS_LABELS: Record<string, string> = {
+  PENDING: "Processing",
+  DELIVERED: "Delivered",
+  COMPLETED: "Completed",
+  DISPUTED: "Disputed",
+  CANCELLED: "Cancelled",
+};
+
 const PAYMENT_RECORD_STATUS_LABELS: Record<string, string> = {
   PENDING: "Pending",
   AWAITING: "Awaiting",
@@ -48,6 +56,10 @@ export function paymentMethodLabel(method: string | null | undefined): string {
 
 export function paymentStatusLabel(status: string): string {
   return PAYMENT_STATUS_LABELS[status] ?? status;
+}
+
+export function orderStatusLabel(status: string): string {
+  return ORDER_STATUS_LABELS[status] ?? status;
 }
 
 export function paymentRecordStatusLabel(status: string): string {

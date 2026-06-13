@@ -18,6 +18,7 @@
     "images:all": "tsx prisma/regenerate-all-covers.ts",
     "images:download": "tsx prisma/download-game-covers.ts",
     "db:reset": "prisma db push && tsx prisma/seed.ts",
+    "db:patch-traders": "tsx prisma/patch-traders.ts",
     "db:push": "prisma db push"
   },
   "dependencies": {

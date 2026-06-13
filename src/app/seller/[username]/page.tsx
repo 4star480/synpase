@@ -1,7 +1,9 @@
+import Link from "next/link";
 import { notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { avgRating, listingsBySeller } from "@/lib/queries";
 import { sellerIsOnline } from "@/lib/seller-status";
+import { displaySalesCount } from "@/lib/trader-stats";
 import { ListingCard } from "@/components/ListingCard";
 import { Avatar } from "@/components/Avatar";
 import { RatingStars } from "@/components/RatingStars";
@@ -17,6 +19,7 @@ export default async function SellerPage({ params }: { params: Promise<{ usernam
       avatarHue: true,
       verified: true,
       memberSince: true,
+      salesCount: true,
       reviews: {
         select: {
           id: true,
@@ -35,8 +38,14 @@ export default async function SellerPage({ params }: { params: Promise<{ usernam
 
   const [listings, completedSales] = await Promise.all([
     listingsBySeller(seller.id),
-    prisma.order.count({ where: { listing: { sellerId: seller.id }, status: "COMPLETED" } }),
+    prisma.order.count({
+      where: {
+        listing: { sellerId: seller.id },
+        status: { in: ["DELIVERED", "COMPLETED"] },
+      },
+    }),
   ]);
+  const totalSales = displaySalesCount(seller.salesCount, completedSales);
   const rating = avgRating(seller.reviews);
   const online = sellerIsOnline(seller.username);
 
@@ -72,7 +81,7 @@ export default async function SellerPage({ params }: { params: Promise<{ usernam
           <dl className="grid w-full grid-cols-3 gap-4 text-center sm:flex sm:w-auto sm:gap-8">
             <div>
               <dt className="text-xs text-muted">Sales</dt>
-              <dd className="text-2xl font-extrabold text-accent">{completedSales}</dd>
+              <dd className="text-2xl font-extrabold text-accent">{totalSales.toLocaleString()}</dd>
             </div>
             <div>
               <dt className="text-xs text-muted">Active offers</dt>

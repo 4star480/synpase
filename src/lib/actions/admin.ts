@@ -8,6 +8,7 @@ import { requireAdmin } from "@/lib/session";
 import { saveListingImage } from "@/lib/upload";
 import { CATEGORIES } from "@/lib/format";
 import { resolveListingImage } from "@/lib/listing-images";
+import { isListingUploadPath } from "@/lib/listing-upload-path";
 
 export type AdminFormState = { error?: string; success?: string };
 
@@ -53,6 +54,11 @@ function parseListingFields(formData: FormData) {
 }
 
 async function resolveImage(formData: FormData, gameId: string, category: string, currentPath = "") {
+  const uploadedPath = String(formData.get("uploadedImagePath") ?? "").trim();
+  if (uploadedPath && isListingUploadPath(uploadedPath)) {
+    return { imagePath: uploadedPath };
+  }
+
   const file = formData.get("image");
   if (file instanceof File && file.size > 0) {
     const saved = await saveListingImage(file);

@@ -45,7 +45,7 @@ export async function startCheckout(opts: {
             priceCents: listing.priceCents,
             paymentMethod: "GIFT_CARD",
             paymentStatus: "PAID",
-            status: "PENDING",
+            status: "DELIVERED",
           },
         });
 
@@ -165,7 +165,7 @@ export async function completeCryptoPayment(orderId: string, txHash?: string) {
   await prisma.$transaction([
     prisma.order.update({
       where: { id: orderId },
-      data: { paymentStatus: "PAID" },
+      data: { paymentStatus: "PAID", status: "DELIVERED" },
     }),
     prisma.payment.update({
       where: { orderId },

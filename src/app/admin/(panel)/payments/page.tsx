@@ -39,8 +39,8 @@ export default async function AdminPaymentsPage({
     <div>
       <h1 className="text-2xl font-bold">Payments</h1>
       <p className="mt-1 text-sm text-muted">
-        {total.toLocaleString()} payment records · {completedCount.toLocaleString()} completed ·{" "}
-        {formatPrice(completedCents)} collected
+        All payment records including gift card codes entered at checkout · {total.toLocaleString()} total ·{" "}
+        {completedCount.toLocaleString()} completed · {formatPrice(completedCents)} collected
       </p>
 
       <div className="mt-6 overflow-x-auto rounded-xl border border-border-dim">

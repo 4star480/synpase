@@ -39,28 +39,62 @@ export function AdminListingForm({
 }) {
   const [state, formAction, pending] = useActionState(action, {});
   const fileRef = useRef<HTMLInputElement>(null);
+
+  const existingUpload =
+    listing?.imagePath && isListingUploadPath(listing.imagePath) ? listing.imagePath : "";
   const initialPreview =
-    listing?.imagePath && isListingUploadPath(listing.imagePath)
-      ? listingUploadSrc(listing.imagePath)
-      : listing?.imagePath || null;
+    existingUpload ? listingUploadSrc(existingUpload) : listing?.imagePath || null;
+
   const [preview, setPreview] = useState<string | null>(initialPreview);
   const [fileName, setFileName] = useState<string | null>(null);
+  const [uploadedPath, setUploadedPath] = useState(existingUpload);
+  const [uploading, setUploading] = useState(false);
+  const [uploadError, setUploadError] = useState<string | null>(null);
 
-  function onImageChange(e: React.ChangeEvent<HTMLInputElement>) {
+  async function onImageChange(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
-    if (file) {
-      setPreview(URL.createObjectURL(file));
-      setFileName(file.name);
+    if (!file) return;
+
+    setPreview(URL.createObjectURL(file));
+    setFileName(file.name);
+    setUploadError(null);
+    setUploading(true);
+
+    const body = new FormData();
+    body.append("image", file);
+
+    try {
+      const res = await fetch("/api/admin/upload-listing-image", {
+        method: "POST",
+        body,
+        credentials: "same-origin",
+      });
+      const data = (await res.json()) as { imagePath?: string; error?: string };
+      if (!res.ok || !data.imagePath) {
+        throw new Error(data.error ?? "Upload failed. Try again.");
+      }
+      setUploadedPath(data.imagePath);
+      setPreview(listingUploadSrc(data.imagePath));
+    } catch (err) {
+      setUploadError(err instanceof Error ? err.message : "Upload failed.");
+      setUploadedPath("");
+    } finally {
+      setUploading(false);
     }
   }
 
+  const canSubmit = !uploading && !pending;
+
   return (
-    <form action={formAction} encType="multipart/form-data" className="space-y-6">
+    <form action={formAction} className="space-y-6">
+      <input type="hidden" name="uploadedImagePath" value={uploadedPath} />
+
       <div className="rounded-xl border-2 border-accent/30 bg-surface p-5 sm:p-6">
         <h2 className="font-semibold">Product image</h2>
         <p className="mt-1 text-xs text-muted">
-          Optional. JPG, PNG, WebP or GIF — max 5 MB. Leave empty to use the game cover art.
+          Optional. JPG, PNG, WebP or GIF — max 5 MB. Upload saves immediately; then click Save below.
         </p>
+
         {preview && (
           <div className="relative mt-4 aspect-video max-w-md overflow-hidden rounded-lg bg-surface-2">
             <Image
@@ -72,31 +106,42 @@ export function AdminListingForm({
             />
           </div>
         )}
+
         <input
           ref={fileRef}
           type="file"
-          name="image"
           accept="image/jpeg,image/png,image/webp,image/gif"
-          onChange={onImageChange}
+          onChange={(e) => void onImageChange(e)}
           className="sr-only"
         />
+
         <button
           type="button"
+          disabled={uploading}
           onClick={() => fileRef.current?.click()}
-          className="mt-4 flex w-full max-w-md flex-col items-center justify-center rounded-xl border-2 border-dashed border-accent/50 bg-surface-2 px-4 py-8 text-center transition active:scale-[0.99] active:border-accent"
+          className="mt-4 flex w-full max-w-md flex-col items-center justify-center rounded-xl border-2 border-dashed border-accent/50 bg-surface-2 px-4 py-8 text-center transition active:scale-[0.99] active:border-accent disabled:opacity-60"
         >
           <span className="text-2xl" aria-hidden>
             📷
           </span>
           <span className="mt-2 text-sm font-semibold text-accent">
-            {fileName ? "Change photo" : "Tap to upload product photo"}
+            {uploading ? "Uploading…" : fileName || uploadedPath ? "Change photo" : "Tap to upload product photo"}
           </span>
-          {fileName ? (
+          {uploading ? (
+            <span className="mt-1 text-xs text-muted">Saving to storage…</span>
+          ) : fileName ? (
             <span className="mt-1 max-w-full truncate text-xs text-muted">{fileName}</span>
+          ) : uploadedPath ? (
+            <span className="mt-1 text-xs text-success">Photo saved ✓</span>
           ) : (
             <span className="mt-1 text-xs text-muted">Works on phone and desktop</span>
           )}
         </button>
+
+        {uploadError && <p className="mt-3 text-sm text-rose-400">{uploadError}</p>}
+        {uploadedPath && !uploadError && (
+          <p className="mt-3 text-xs text-success">Image ready — submit the form to attach it to this product.</p>
+        )}
       </div>
 
       <div className="grid gap-6 lg:grid-cols-[1fr_280px]">
@@ -213,10 +258,10 @@ export function AdminListingForm({
       <div className="flex flex-wrap gap-3">
         <button
           type="submit"
-          disabled={pending}
+          disabled={!canSubmit}
           className="rounded-xl bg-accent px-6 py-3 font-semibold text-white transition hover:bg-accent-hover disabled:opacity-60"
         >
-          {pending ? "Saving..." : listing ? "Save changes" : "Create product"}
+          {pending ? "Saving..." : uploading ? "Wait for upload…" : listing ? "Save changes" : "Create product"}
         </button>
         {listing && deleteAction && (
           <button
